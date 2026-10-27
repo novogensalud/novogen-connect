@@ -1,0 +1,272 @@
+{
+  "source_url": "https://novogen-connect-franc.francisco-ortiz0903.chatgpt.site",
+  "retrieved_at": "2026-10-27",
+  "kind": "public production build; original editable React sources not provided",
+  "files": [
+    {
+      "path": "assets/Isotipo-dTGZmI3s.webp",
+      "bytes": 15316,
+      "sha256": "2eefd472510062003681cc670abcd923f28ae3d0595ae960b879770163fd2d66"
+    },
+    {
+      "path": "assets/Logo-BZ5nc2HE.webp",
+      "bytes": 64308,
+      "sha256": "3971e85c5bf1bb074f2531715e20c13b1486b7e4366fd2bacd3fc07ddc6615c1"
+    },
+    {
+      "path": "assets/index-BYM0Pqi2.js",
+      "bytes": 294301,
+      "sha256": "f6f6bf8c9386f9e90f82a348fb62c9e0e8b625728c555a488f70c6afb058770b"
+    },
+    {
+      "path": "assets/index-CCqY9ld8.css",
+      "bytes": 52028,
+      "sha256": "99a9da665dfa6dd8a9fe23707e9681dde8a4dd65a30bb2f9631211d230db78d4"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-400-normal-BPq32Q8K.woff2",
+      "bytes": 10980,
+      "sha256": "b2e276e2401a1539faea5639b69df0bfed888c2b26178d990c7af37a420a678b"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-400-normal-jEs4Tk-Z.woff",
+      "bytes": 10912,
+      "sha256": "2f2fee9643e77199f1bcffa2421f8cc4d695649b9fe0a5477df7e1fb891c71f0"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-500-normal-CyGtXmN9.woff",
+      "bytes": 10992,
+      "sha256": "51d78e853f7eb8f7f0399149a2d39b8bacb42b57f89e6b086a0daf940f95a606"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-500-normal-T0SG181k.woff2",
+      "bytes": 11128,
+      "sha256": "7d2f0315ec3282dd809e7d3cefccaf501113a2076a18fa0293cf70b931a463ad"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-600-normal-CQEPC0hM.woff2",
+      "bytes": 11120,
+      "sha256": "12fe2b174f70b732553c46dae097be6a70b3f4a3d3cf305dbbbf236ac3b182b7"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-600-normal-DUglwBrH.woff",
+      "bytes": 10976,
+      "sha256": "e43f70482ed5f31349432c33e73a9fbf3f73491b98b2c881fa0351dbe71b4217"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-700-normal-BvLYcGP1.woff",
+      "bytes": 10928,
+      "sha256": "045bd7c4e47fa6e32d2c2eb2b739050f0e30eec8da01b3dac4eed3467a299f29"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-700-normal-D-Pqjtdp.woff2",
+      "bytes": 11160,
+      "sha256": "c6880741986ff5648d6b6c08ebbacfe7ba77861a002bff2643b8af4221f40d34"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-400-normal-DRPPeomZ.woff",
+      "bytes": 12088,
+      "sha256": "da6692e47c27041ce8a398d0e8247cb639186ceae7a4245132daaef9253f8d72"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-400-normal-Xqov12YL.woff2",
+      "bytes": 11940,
+      "sha256": "d2b0f62ec1a296267618c01aae126ee87540b548f647776cd12dd9ef2a533265"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-500-normal-11xBT7e1.woff2",
+      "bytes": 11956,
+      "sha256": "630211df38da5158405937d8f947e8f22b4c676185a673631667da59115c4692"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-500-normal-DOzfAZ45.woff",
+      "bytes": 12056,
+      "sha256": "10f3126de3be09e3f0dafeb89c08d5aa0d786947c7d7e188e4734a556e661b60"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-600-normal-BtBW-rpm.woff2",
+      "bytes": 12060,
+      "sha256": "5cdc3c54c076ef8ce55a8e21e306c9a57720c48b5f77853e28a6abd62aa23c15"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-600-normal-wReYPmz2.woff",
+      "bytes": 12084,
+      "sha256": "9e00d8fdf9541ec2e41da6444499631de33fa2f976136adea0af76c85dc01792"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-700-normal-D-Mk2xRJ.woff",
+      "bytes": 12076,
+      "sha256": "f5b4da408ba6252566942f8910a76278dd3839e9ac5dd5bdc9f67a4553176f57"
+    },
+    {
+      "path": "assets/montserrat-cyrillic-ext-700-normal-MyDreaeu.woff2",
+      "bytes": 12060,
+      "sha256": "b930b83240c1c3e2aa3c81e24b828c8e68bba79f7d23483f6346cdb5fce5173f"
+    },
+    {
+      "path": "assets/montserrat-latin-400-normal-BLhwKU8k.woff2",
+      "bytes": 18780,
+      "sha256": "e66bcd2761ab6924b25ce70dafe10e57a39193c4fea1516730bd9cb5240af6c8"
+    },
+    {
+      "path": "assets/montserrat-latin-400-normal-xItZbAXg.woff",
+      "bytes": 20648,
+      "sha256": "6a7d6a30d2b8cdc9dd4092918ad2d9a45006f19987300b6a1c1f7a2bde5b0ea3"
+    },
+    {
+      "path": "assets/montserrat-latin-500-normal-DRFEGfly.woff2",
+      "bytes": 18748,
+      "sha256": "2b53300fb9471520df2f4905847fb7a209879b2029ae893c05c6ee346b1320cd"
+    },
+    {
+      "path": "assets/montserrat-latin-500-normal-Dok2oTci.woff",
+      "bytes": 20608,
+      "sha256": "7ad98b2ca2dc427864d01fb65105285a5f8228032e936d6f3316e6563a904237"
+    },
+    {
+      "path": "assets/montserrat-latin-600-normal-CdhFl4lI.woff",
+      "bytes": 20548,
+      "sha256": "97ec588256114183969b5f3d3a53ce26d9beb1f04c8373c866f318afc85638c0"
+    },
+    {
+      "path": "assets/montserrat-latin-600-normal-UVxSCcoG.woff2",
+      "bytes": 18688,
+      "sha256": "d857325c360f7128b347ca924c1974967aaa886ba47dad22e4042d6c38b26a83"
+    },
+    {
+      "path": "assets/montserrat-latin-700-normal-BWkrl476.woff",
+      "bytes": 20672,
+      "sha256": "ff51c769e51acaa5ffbb8091441ff4e365e41ff21f7e4c05d1cd5650514d6fd3"
+    },
+    {
+      "path": "assets/montserrat-latin-700-normal-BdjcYUrC.woff2",
+      "bytes": 18824,
+      "sha256": "f9d9e65b15372cebcafc3acd1e664a564c5c4b23278de4d5760de9a13c530371"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-400-normal-B8bwfy6Y.woff2",
+      "bytes": 32272,
+      "sha256": "30f166cea0894715f7b1342798306dd4206bc1d0331440d543f6e7f7fff04539"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-400-normal-BffdBkAA.woff",
+      "bytes": 40368,
+      "sha256": "6459fd9979e99ccdafaef9fbde04b183c825ae089a5771ca78907bb32561085f"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-500-normal-BKtbrd6n.woff2",
+      "bytes": 32292,
+      "sha256": "e28f60d292d6574d2cb5c0b63fd3e893ae6d9a17d698afc9d037643dcfde4228"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-500-normal-DWPqqZgs.woff",
+      "bytes": 40392,
+      "sha256": "05b0efc4b2144eaf91416979d6a57686392aec08189ba3a543e6270d401ebd58"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-600-normal-CSDhkhgS.woff",
+      "bytes": 41036,
+      "sha256": "519a67a81579600b703ed5fc636a2c48b21085d948c3c7c667136b91c831b7f5"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-600-normal-DSkTqI9L.woff2",
+      "bytes": 33192,
+      "sha256": "1d8a4af6a50cc4f7561e8484d5bff39acda90016b8e8cbb5cee69c253bb02750"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-700-normal-BOP2Nhf0.woff2",
+      "bytes": 33532,
+      "sha256": "a59fcc944a712e213a2f3bd994367129217c75f24a9155a5a3c1a0f5fd2cc9a7"
+    },
+    {
+      "path": "assets/montserrat-latin-ext-700-normal-DdDFr05Z.woff",
+      "bytes": 41344,
+      "sha256": "9829177ccd843b997deb7f5e5458a435bdb5fa79f0ae327976c119bacde570fd"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-400-normal-BeEscFYY.woff",
+      "bytes": 7268,
+      "sha256": "f329a8136004575967c3a9893775a0b81b2055ce39c6358780b3ed0ec3e11621"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-400-normal-D4oHqQTd.woff2",
+      "bytes": 7896,
+      "sha256": "575aa330708efd0385558f2649d4deedcfdab42059eeffbd5e53dcacddf614b0"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-500-normal-DpeZlV_K.woff",
+      "bytes": 7248,
+      "sha256": "c791fc57927389055c0cb735ea4c8d7f89d39a84e5b2266b8be049d274ce61a2"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-500-normal-NT-t8RG1.woff2",
+      "bytes": 7872,
+      "sha256": "47a7333ad07599329dabfdfe109196e3b3ccd778fb223ec7b9e9facff4855da7"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-600-normal-DKe6qT_E.woff2",
+      "bytes": 7904,
+      "sha256": "c4875c3754e594f283a2dbec1086da519d784f559cb7062b6d4d9721b667acd8"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-600-normal-SJ-HTWuM.woff",
+      "bytes": 7304,
+      "sha256": "b2038f48f2a9968cca1728140bd16fbed6170973909ba91d391e6c3e5e1449a4"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-700-normal-C0x1De3p.woff2",
+      "bytes": 7904,
+      "sha256": "da6ed50e8a351c07e86d912207c8dd7a336c644ff6dbf2a40555a08f2406519e"
+    },
+    {
+      "path": "assets/montserrat-vietnamese-700-normal-DnwGT2D9.woff",
+      "bytes": 7304,
+      "sha256": "9b38aecdaa108e02cd2b16e8b4831c9b1e298cb560e69cad38c0f6c37b28223e"
+    },
+    {
+      "path": "favicon.ico",
+      "bytes": 7739,
+      "sha256": "a4e3586017cf649c7f6498c8b51df7ed058d0e9f8138dbbe68838c731d3c7e11"
+    },
+    {
+      "path": "icons/apple-touch-icon.png",
+      "bytes": 46070,
+      "sha256": "2d28438407c8944cc60d44732c7ec7adbea75c5d9e04133a22ebb73c370dff0a"
+    },
+    {
+      "path": "icons/favicon-32.png",
+      "bytes": 2334,
+      "sha256": "8e6d1080d3d4e4b4d797f350ea47f963424e2acd901a40d4a7b09d410f915625"
+    },
+    {
+      "path": "icons/icon-192.png",
+      "bytes": 52665,
+      "sha256": "80b291c47cce84dd44b9d54799cbb7b141e76144cb546f64e9cdc0167bfba60f"
+    },
+    {
+      "path": "icons/icon-512.png",
+      "bytes": 318925,
+      "sha256": "c26869944b6f31070851e35c691df51245f0b4e82b4c30038288ec7868e43580"
+    },
+    {
+      "path": "icons/icon-maskable-512.png",
+      "bytes": 312349,
+      "sha256": "9389effd46b51ffddf479de5dc9728ede065b0c711ad45a1e28caf2810430a1a"
+    },
+    {
+      "path": "index.html",
+      "bytes": 1405,
+      "sha256": "41550d16a3784de37de8ed2eb8d0ae4f685ea920141252de15df960c54ea4e86"
+    },
+    {
+      "path": "manifest.webmanifest",
+      "bytes": 726,
+      "sha256": "99b8b772f1b44b8e2c304b0ce3346c264b3a0c082b4fb4cc01d6583da81aefd4"
+    },
+    {
+      "path": "sw.js",
+      "bytes": 6725,
+      "sha256": "e06143e71a88c13b0808ac6099b150c13107dfb2e116237d775e4427c5d82535"
+    }
+  ]
+}

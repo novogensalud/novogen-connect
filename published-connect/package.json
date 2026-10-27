@@ -1,0 +1,9 @@
+{
+  "name": "novogen-connect-recovered",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Copia verificable del frontend publicado de NOVOGEN CONNECT",
+  "scripts": { "start": "node server.mjs", "dev": "node server.mjs", "test": "node --test recovery.test.mjs" },
+  "engines": { "node": ">=22" }
+}
