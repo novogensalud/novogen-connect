@@ -50,3 +50,16 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Vercel asignó automáticamente a Production el primer despliegue de un proyecto vacío. Ese despliegue inicial se retiró después de verificar el Preview, para no conservar una versión sin las variables correctas.
 - No se modificaron DNS, WordPress ni el sitio estático anterior. La integración Git con despliegues automáticos todavía no se conectó; este Preview se subió mediante CLI.
 - `.vercel/` y `.env.local` creados por la CLI son archivos locales ignorados; no deben versionarse ni imprimirse, y la autenticación CLI no se debe asumir disponible en otra máquina.
+
+## Preview de seguimiento y métricas — 27 de octubre de 2026
+
+- Código funcional desplegado: commit `5d51ccc` de `feature/connect-crm`.
+- Despliegue Ready, Preview: `dpl_2xuXF5RMTrrDpRmT61fkA5DJX6q8`.
+- URL inmutable: https://novogen-connect-bl18kouac-novogen1.vercel.app
+- Alias estable de pruebas: https://novogen-connect-pruebas-novogen1.vercel.app
+- Ingreso recomendado: https://novogen-connect-pruebas-novogen1.vercel.app/login
+- En siguientes actualizaciones de prueba, reasignar el alias con `vercel alias set <preview-verificado> novogen-connect-pruebas-novogen1.vercel.app --scope novogen1`, después de verificar el Preview. Mantener este origen evita perder sesiones y comprobantes de clientes por cambiar de hostname en cada versión.
+- Verificación remota con la protección de Vercel: health 200/configured; login 200; CRM sin sesión 307 a login; notificaciones internas sin sesión 401; estado de cliente sin comprobante sin datos; manifiesto PWA 200. El formulario de ingreso también se verificó en el alias estable.
+- El operador informó la ejecución satisfactoria del activador 003 con `connect-commercial-hourly`, schedule `* * * * *`, active true. Se comprobó desde la aplicación la existencia/protección de tablas nuevas y la columna de subcategorías. El historial real de ejecuciones de cron requiere revisión desde SQL Editor; no es accesible con la clave pública.
+- Regla comercial: recordatorio cada 60 minutos, resaltado rojo tras 24 horas sin avance. El job revisa cada minuto y deduplica por usuario/tarea/ciclo; no envía avisos cada minuto.
+- Web Push con la app cerrada y mensajería automática de WhatsApp/correo continúan pendientes. La protección de acceso de Vercel sigue activa para esta versión de prueba.
