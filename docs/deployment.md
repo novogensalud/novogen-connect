@@ -34,3 +34,19 @@ En una importación Git, revisar explícitamente la rama antes de desplegar. Si 
 7. Tras la revisión, habilitar el espacio deliberadamente y probar punto QR → solicitud → contacto/oportunidad, distinguiendo accesos de ventas.
 
 Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anterior sitio estático con el nuevo despliegue. No se considera validado el acceso administrativo hasta que una sesión real complete el recorrido.
+
+## Primer Preview verificado — 27 de octubre de 2026
+
+- Equipo Vercel: `novogen1` (NOVOGEN), plan Hobby.
+- Proyecto: `novogen-connect`.
+- Preview: https://novogen-connect-6ui94yj20-novogen1.vercel.app
+- Ingreso: https://novogen-connect-6ui94yj20-novogen1.vercel.app/login
+- ID del despliegue: `dpl_BgV9hi5Rruvtm2DRP8ieYDExSAQe`; estado Ready, target Preview.
+- Ambas variables públicas de Supabase se configuraron en Preview mediante la CLI, sin copiarlas al repositorio. No están configuradas en Production.
+- Verificación remota mediante el acceso de automatización oficial de Vercel: `/api/health` devolvió 200 con `configured-not-verified`; `/login` devolvió 200 con el formulario; `/crm` sin sesión devolvió 307 a `/login`.
+- `/connect/novogen` devolvió 404 porque el espacio NOVOGEN todavía no está publicado. Se debe revisar el catálogo dentro del CRM antes de habilitarlo.
+- Se mantiene la protección de acceso de Vercel. El propietario debe ingresar a Vercel si se le solicita y luego usar la cuenta de aplicación de Supabase en el formulario del CRM.
+- Falta verificar el ingreso administrativo con la cuenta real y el recorrido autenticado de contactos; requiere que el propietario ingrese su contraseña personalmente.
+- Vercel asignó automáticamente a Production el primer despliegue de un proyecto vacío. Ese despliegue inicial se retiró después de verificar el Preview, para no conservar una versión sin las variables correctas.
+- No se modificaron DNS, WordPress ni el sitio estático anterior. La integración Git con despliegues automáticos todavía no se conectó; este Preview se subió mediante CLI.
+- `.vercel/` y `.env.local` creados por la CLI son archivos locales ignorados; no deben versionarse ni imprimirse, y la autenticación CLI no se debe asumir disponible en otra máquina.
