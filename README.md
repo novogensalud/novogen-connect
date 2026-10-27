@@ -93,3 +93,7 @@ El 27 de octubre de 2026 se verificó que la clave configurada es pública Publi
 En este entorno cloud, Node necesita `NODE_USE_ENV_PROXY=1` para respetar la ruta de red configurada. Se verificó con el runtime Node 24. Para desarrollo con las credenciales configuradas: `NODE_USE_ENV_PROXY=1 npm run dev`. Fuera del entorno con proxy se usan los comandos normales.
 
 Las pruebas de navegador configuran variables Supabase vacías en su propio servidor para probar explícitamente la demostración. La configuración se lee dinámicamente en servidor; una compilación retenida puede tomar las variables del entorno que la ejecuta.
+
+## Seguimiento y notificaciones
+
+Nueva vista **Seguimiento y métricas**, recordatorios internos cada hora, indicador rojo a las 24 horas, estado privado de solicitudes para clientes y métricas opcionales propias de CONNECT. Requiere migración 003; el programador horario se activa por separado. Consulta [activación, pruebas y límites](docs/followup-and-notifications.md). WhatsApp/correo automáticos, Web Push con la app cerrada y PostHog todavía no están conectados.

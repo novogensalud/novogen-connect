@@ -14,6 +14,8 @@ export function ServiceInfo({
     <>
       <button
         className="inline-link info-trigger"
+        data-connect-event="service_view"
+        data-service-id={service.id}
         onClick={() => dialog.current?.showModal()}
       >
         Más información <ArrowUpRight size={16} />

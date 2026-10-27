@@ -44,6 +44,22 @@ export const demoServices: Service[] = [
       "Conoce SUPLE, RECOVERY y GLOW. Nuestro equipo puede orientarte.",
     active: true,
   },
+  ...(["SUPLE", "RECOVERY", "GLOW"] as const).map((name, i) => ({
+    id: `10000000-0000-4000-8000-00000000000${i + 6}`,
+    name,
+    category: "OPTIMIZA",
+    subcategory: name,
+    description: `Solicita información comercial sobre ${name}.`,
+    active: true,
+  })),
+  {
+    id: "10000000-0000-4000-8000-000000000009",
+    name: "SEGUIMIENTO",
+    category: "SEGUIMIENTO",
+    description:
+      "Información comercial sobre seguimiento y suscripciones. Sin registro de información clínica.",
+    active: true,
+  },
 ];
 export const demoLeads: Lead[] = [
   {

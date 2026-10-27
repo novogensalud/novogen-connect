@@ -1,6 +1,7 @@
 "use server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { randomBytes } from "node:crypto";
 import { supabase, isConfigured } from "@/lib/supabase";
 import { leadSchema, serviceSchema, stages } from "@/lib/domain";
@@ -20,7 +21,7 @@ async function admin(f: FormData) {
     .eq("user_id", user.id)
     .single();
   if (error || !data) redirect("/crm?notice=forbidden");
-  return { db, org, role: data.role as string };
+  return { db, org, role: data.role as string, userId: user.id };
 }
 function back(org: string, notice: string): never {
   revalidatePath("/crm");
@@ -95,13 +96,11 @@ export async function addPoint(f: FormData) {
   if (role !== "admin") back(org, "forbidden");
   const name = value(f, "name").trim();
   if (name.length < 2 || name.length > 80) back(org, "invalid");
-  const { error } = await db
-    .from("connect_points")
-    .insert({
-      organization_id: org,
-      name,
-      code: randomBytes(16).toString("hex"),
-    });
+  const { error } = await db.from("connect_points").insert({
+    organization_id: org,
+    name,
+    code: randomBytes(16).toString("hex"),
+  });
   back(org, error ? "error" : "saved");
 }
 export async function togglePoint(f: FormData) {
@@ -123,7 +122,7 @@ export async function submitLead(f: FormData) {
   const parsed = leadSchema.safeParse(Object.fromEntries(f));
   if (!parsed.success) redirect(`${path}?notice=invalid#contacto`);
   const db = await supabase();
-  const { error } = await db.rpc("capture_lead", {
+  const payload = {
     p_slug: slug,
     p_name: parsed.data.name,
     p_email: parsed.data.email,
@@ -131,7 +130,29 @@ export async function submitLead(f: FormData) {
     p_service: parsed.data.service || null,
     p_code: value(f, "point") || null,
     p_consent: true,
+  };
+  const requestType = value(f, "request_type") || "information";
+  if (!["information", "subscription", "human"].includes(requestType))
+    redirect(`${path}?notice=invalid#contacto`);
+  const receipt = randomBytes(32).toString("hex");
+  let { error } = await db.rpc("capture_connect_request", {
+    ...payload,
+    p_request_type: requestType,
+    p_receipt: receipt,
   });
+  if (error?.code === "PGRST202" && requestType === "information") {
+    const legacy = await db.rpc("capture_lead", payload);
+    error = legacy.error;
+  } else if (!error) {
+    (await cookies()).set(`connect_receipt_${slug}`, receipt, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+    });
+  }
+
   redirect(`${path}?notice=${error ? "error" : "received"}#contacto`);
 }
 export async function createContact(f: FormData) {
@@ -147,4 +168,67 @@ export async function createContact(f: FormData) {
     p_consent: true,
   });
   back(org, error ? "error" : "saved");
+}
+
+export async function saveFollowupSettings(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const minutes = Number(value(f, "reminder_minutes"));
+  if (!Number.isInteger(minutes) || minutes < 15 || minutes > 43200)
+    back(org, "invalid");
+  const { data, error: readError } = await db
+    .from("followup_settings")
+    .select("organization_id")
+    .eq("organization_id", org)
+    .maybeSingle();
+  if (readError) back(org, "error");
+  const result = data
+    ? await db
+        .from("followup_settings")
+        .update({ reminder_minutes: minutes })
+        .eq("organization_id", org)
+    : await db
+        .from("followup_settings")
+        .insert({ organization_id: org, reminder_minutes: minutes });
+  revalidatePath("/crm");
+  redirect(
+    `/crm?org=${org}&view=automation&notice=${result.error ? "error" : "saved"}`,
+  );
+}
+export async function updateFollowup(f: FormData) {
+  const { db, org, userId } = await admin(f);
+  const state = value(f, "state");
+  if (!["pending", "done", "cancelled"].includes(state)) back(org, "invalid");
+  const patch: { state: string; assigned_to?: string; due_at?: string } = {
+    state,
+  };
+  if (value(f, "claim") === "on") patch.assigned_to = userId;
+  const minutes = Number(value(f, "snooze"));
+  if (minutes) {
+    if (!Number.isInteger(minutes) || minutes < 15 || minutes > 43200)
+      back(org, "invalid");
+    patch.due_at = new Date(Date.now() + minutes * 60000).toISOString();
+  }
+  const { error } = await db
+    .from("followup_tasks")
+    .update(patch)
+    .eq("organization_id", org)
+    .eq("id", value(f, "id"));
+  revalidatePath("/crm");
+  redirect(
+    `/crm?org=${org}&view=automation&notice=${error ? "error" : "saved"}`,
+  );
+}
+export async function readNotification(f: FormData) {
+  const { db, org, userId } = await admin(f);
+  const { error } = await db
+    .from("commercial_notifications")
+    .update({ read_at: new Date().toISOString() })
+    .eq("id", value(f, "id"))
+    .eq("organization_id", org)
+    .eq("recipient_id", userId);
+  revalidatePath("/crm");
+  redirect(
+    `/crm?org=${org}&view=automation&notice=${error ? "error" : "saved"}`,
+  );
 }

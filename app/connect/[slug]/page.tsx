@@ -1,3 +1,5 @@
+import { TrackingConsent } from "@/components/tracking-consent";
+import { DeviceAlerts } from "@/components/device-alerts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -47,7 +49,7 @@ export default async function Flash({
     org = data;
     const result = await db
       .from("services")
-      .select("id,name,description,category,active")
+      .select("*")
       .eq("organization_id", org.id)
       .eq("active", true)
       .order("created_at");
@@ -139,6 +141,7 @@ export default async function Flash({
                 </a>
                 <a
                   className="whatsapp"
+                  data-connect-event="whatsapp_click"
                   href="https://wa.me/56944683094"
                   aria-label="WhatsApp de NOVOGEN"
                   target="_blank"
@@ -146,9 +149,17 @@ export default async function Flash({
                 >
                   <MessageCircle size={25} />
                 </a>
+                <a
+                  href="mailto:novogen.temuco@gmail.com"
+                  data-connect-event="email_click"
+                  aria-label="Correo de NOVOGEN"
+                >
+                  @
+                </a>
               </div>
               <a
                 className="institution-button"
+                data-connect-event="website_click"
                 href="https://novogensalud.cl/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -172,7 +183,10 @@ export default async function Flash({
           <div className="connect-services">
             {services.map((s) => (
               <article key={s.id} className="connect-service">
-                <span className="eyebrow">{s.category}</span>
+                <span className="eyebrow">
+                  {s.category}
+                  {s.subcategory ? ` / ${s.subcategory}` : ""}
+                </span>
                 <h3>{s.name}</h3>
                 <p>{s.description}</p>
                 <ServiceInfo
@@ -226,6 +240,10 @@ export default async function Flash({
                 {notices[query.notice]}
               </div>
             )}
+            <DeviceAlerts
+              endpoint={`/api/contact-status?slug=${slug}`}
+              title="Actualizaciones de tu solicitud"
+            />
             <form action={submitLead} className="stack-form">
               <input type="hidden" name="slug" value={slug} />
               <input type="hidden" name="point" value={query.point ?? ""} />
@@ -276,6 +294,16 @@ export default async function Flash({
                   ))}
                 </select>
               </label>
+              <label>
+                Tipo de consulta
+                <select name="request_type">
+                  <option value="information">Información comercial</option>
+                  <option value="subscription">
+                    Suscripciones y seguimiento
+                  </option>
+                  <option value="human">Quiero hablar con una persona</option>
+                </select>
+              </label>
               <label className="checkbox-label">
                 <input type="checkbox" name="consent" required />
                 <span>
@@ -296,6 +324,7 @@ export default async function Flash({
             </form>
           </div>
         </section>
+        <TrackingConsent slug={slug} point={query.point} />
         <footer className="connect-footer">
           <span>CONNECT · SOLVEX</span>
           <Link href="/crm">

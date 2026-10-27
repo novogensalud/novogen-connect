@@ -120,3 +120,90 @@ test("CONNECT home uses organization branding and leads to the CRM", async ({
     page.getByRole("button", { name: "Crear contacto", exact: true }),
   ).toBeDisabled();
 });
+
+test("analytics is opt-in, contains no contact fields and can be withdrawn", async ({
+  page,
+}) => {
+  const events: Record<string, unknown>[] = [];
+  await page.route("**/api/interactions", async (route) => {
+    events.push(route.request().postDataJSON());
+    await route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: '{"stored":false}',
+    });
+  });
+  await page.goto("/connect/novogen");
+  await expect(
+    page.getByRole("button", { name: "Solo lo necesario", exact: true }),
+  ).toBeVisible();
+  expect(events).toHaveLength(0);
+  await page
+    .getByRole("button", { name: "Permitir métricas", exact: true })
+    .click();
+  await expect
+    .poll(() => events.some((e) => e.kind === "page_view"))
+    .toBe(true);
+  await page.getByRole("button", { name: "Más información" }).first().click();
+  await expect
+    .poll(() => events.some((e) => e.kind === "service_view"))
+    .toBe(true);
+  await page
+    .getByRole("button", { name: "Cerrar", exact: true })
+    .first()
+    .click();
+  expect(
+    events.every(
+      (e) =>
+        e.consent === true &&
+        !("email" in e) &&
+        !("url" in e) &&
+        !("name" in e),
+    ),
+  ).toBe(true);
+  await page
+    .getByRole("button", {
+      name: "Desactivar métricas opcionales",
+      exact: true,
+    })
+    .click();
+  const count = events.length;
+  await page.getByRole("button", { name: "Más información" }).first().click();
+  await page
+    .getByRole("button", { name: "Cerrar", exact: true })
+    .first()
+    .click();
+  expect(events).toHaveLength(count);
+});
+test("commercial automation, independent follow-up category and PWA are visible", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/crm");
+  await page
+    .getByRole("link", { name: "Seguimiento y métricas", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Asistente de seguimiento" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Guardar regla", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("Clics a WhatsApp desde CONNECT", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Catálogo", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "SEGUIMIENTO", exact: true }),
+  ).toBeVisible();
+  const manifest = await request.get("/manifest.webmanifest");
+  expect(manifest.status()).toBe(200);
+  expect((await manifest.json()).display).toBe("standalone");
+  const sw = await request.get("/connect-sw.js");
+  expect(sw.status()).toBe(200);
+  expect(await sw.text()).not.toContain("cache.put");
+  const bad = await request.post("/api/interactions", {
+    data: { consent: false, email: "private@example.com" },
+  });
+  expect(bad.status()).toBe(400);
+});

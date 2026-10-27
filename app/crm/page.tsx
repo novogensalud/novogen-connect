@@ -1,3 +1,5 @@
+import { DeviceAlerts } from "@/components/device-alerts";
+import { AutomationPanel } from "@/components/automation-panel";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -12,6 +14,7 @@ import {
   ShieldCheck,
   Search,
   LogOut,
+  BellRing,
 } from "lucide-react";
 import { isConfigured, supabase } from "@/lib/supabase";
 import { demoOrg, demoServices, demoLeads, demoPoints } from "@/lib/demo";
@@ -132,7 +135,7 @@ export default async function Dashboard({
     points = results[2].data ?? [];
     eventCount = results[3].count ?? 0;
   }
-  const view = ["overview", "crm", "catalog", "points"].includes(
+  const view = ["overview", "crm", "catalog", "points", "automation"].includes(
     params.view ?? "",
   )
     ? params.view!
@@ -178,6 +181,11 @@ export default async function Dashboard({
             { id: "crm", label: "CRM comercial", icon: UsersRound },
             { id: "catalog", label: "Catálogo", icon: Layers3 },
             { id: "points", label: "Puntos CONNECT", icon: ScanLine },
+            {
+              id: "automation",
+              label: "Seguimiento y métricas",
+              icon: BellRing,
+            },
           ].map((item) => (
             <Link
               key={item.id}
@@ -233,7 +241,9 @@ export default async function Dashboard({
                     ? "CRM comercial"
                     : view === "catalog"
                       ? "Catálogo de servicios"
-                      : "Puntos CONNECT"}
+                      : view === "automation"
+                        ? "Seguimiento y métricas"
+                        : "Puntos CONNECT"}
               </h1>
               <p>
                 {view === "overview"
@@ -242,7 +252,9 @@ export default async function Dashboard({
                     ? "Acompaña cada oportunidad, desde el primer contacto."
                     : view === "catalog"
                       ? "Una fuente central para todos tus servicios."
-                      : "Conecta un lugar físico con tu espacio digital."}
+                      : view === "automation"
+                        ? "Tareas, avisos y uso de CONNECT en un mismo espacio."
+                        : "Conecta un lugar físico con tu espacio digital."}
               </p>
             </div>
             <Link className="button primary" href={`/connect/${org.slug}`}>
@@ -277,6 +289,19 @@ export default async function Dashboard({
               </label>
               <button className="button">Cambiar</button>
             </form>
+          )}
+          <DeviceAlerts
+            endpoint={`/api/notifications?org=${org.id}`}
+            refreshOnUpdate
+            title="Avisos del equipo comercial"
+          />
+          {view === "automation" && (
+            <AutomationPanel
+              org={org.id}
+              role={role}
+              demo={demo}
+              leads={leads}
+            />
           )}
           {view === "overview" && (
             <>
@@ -573,7 +598,10 @@ export default async function Dashboard({
               <section className="service-grid">
                 {services.map((s) => (
                   <article className="panel service-card" key={s.id}>
-                    <span className="eyebrow">{s.category}</span>
+                    <span className="eyebrow">
+                      {s.category}
+                      {s.subcategory ? ` / ${s.subcategory}` : ""}
+                    </span>
                     <h2>{s.name}</h2>
                     <p>{s.description}</p>
                     <form action={toggleService}>
@@ -620,7 +648,20 @@ export default async function Dashboard({
                                 "BODY",
                                 "COMPRENDE",
                                 "OPTIMIZA",
+                                "SEGUIMIENTO",
                               ].map((c) => (
+                                <option key={c}>{c}</option>
+                              ))}
+                            </select>
+                          </label>
+                          <label>
+                            Subcategoría (solo OPTIMIZA)
+                            <select
+                              name="subcategory"
+                              defaultValue={s.subcategory ?? ""}
+                            >
+                              <option value="">Sin subcategoría</option>
+                              {["SUPLE", "RECOVERY", "GLOW"].map((c) => (
                                 <option key={c}>{c}</option>
                               ))}
                             </select>
@@ -664,11 +705,25 @@ export default async function Dashboard({
                     <label>
                       Categoría
                       <select name="category">
-                        {["CHECK", "VITA", "BODY", "COMPRENDE", "OPTIMIZA"].map(
-                          (c) => (
-                            <option key={c}>{c}</option>
-                          ),
-                        )}
+                        {[
+                          "CHECK",
+                          "VITA",
+                          "BODY",
+                          "COMPRENDE",
+                          "OPTIMIZA",
+                          "SEGUIMIENTO",
+                        ].map((c) => (
+                          <option key={c}>{c}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      Subcategoría (solo OPTIMIZA)
+                      <select name="subcategory">
+                        <option value="">Sin subcategoría</option>
+                        {["SUPLE", "RECOVERY", "GLOW"].map((c) => (
+                          <option key={c}>{c}</option>
+                        ))}
                       </select>
                     </label>
                     <label className="full">

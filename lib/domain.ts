@@ -25,11 +25,27 @@ export const leadSchema = z.object({
   service: z.string().uuid().or(z.literal("")),
   consent: z.literal("on"),
 });
-export const serviceSchema = z.object({
-  name: z.string().trim().min(2).max(80),
-  category: z.enum(["CHECK", "VITA", "BODY", "COMPRENDE", "OPTIMIZA"]),
-  description: z.string().trim().min(5).max(500),
-});
+export const serviceSchema = z
+  .object({
+    subcategory: z.preprocess(
+      (value) => (value === "" ? null : value),
+      z.enum(["SUPLE", "RECOVERY", "GLOW"]).nullable().default(null),
+    ),
+    name: z.string().trim().min(2).max(80),
+    category: z.enum([
+      "CHECK",
+      "VITA",
+      "BODY",
+      "COMPRENDE",
+      "OPTIMIZA",
+      "SEGUIMIENTO",
+    ]),
+    description: z.string().trim().min(5).max(500),
+  })
+  .refine((s) => !s.subcategory || s.category === "OPTIMIZA", {
+    message: "La subcategoría solo corresponde a OPTIMIZA",
+    path: ["subcategory"],
+  });
 export function safeLocalPath(path: string) {
   return /^\/(?!\/)[a-zA-Z0-9/_-]*$/.test(path) ? path : "/";
 }
@@ -40,6 +56,7 @@ export type Service = {
   category: string;
   description: string;
   active: boolean;
+  subcategory?: string | null;
 };
 export type Lead = {
   id: string;

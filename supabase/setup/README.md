@@ -12,3 +12,7 @@ Proyecto autorizado: `dfilxqvbwjsvvhpowecn`.
 `01-install.sql` se genera al concatenar en orden el contenido de `supabase/migrations/*.sql`, sin sus transacciones individuales, dentro de una transacción común. Si cambian las migraciones, regenerar esta copia antes de utilizarla.
 
 No introducir claves `secret`, `service_role` ni contraseñas dentro de estos archivos. El backend sigue usando la clave pública y las políticas por organización.
+
+## Actualización: seguimiento e interacciones
+
+Para una base existente con 001 y 002, ejecutar una sola vez `03-activate-automation.sql`. Añade tareas, avisos horarios, rojo a las 24 horas, métricas consentidas y fichas de SUPLE/RECOVERY/GLOW y SEGUIMIENTO. Si 003 ya se aplicó, usar solo `04-enable-hourly-reminders.sql` para programar el job. No volver a ejecutar `01-install.sql` en una base que ya contiene CONNECT. Consulta `docs/followup-and-notifications.md`.
