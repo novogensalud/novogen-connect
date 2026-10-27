@@ -2096,3 +2096,59 @@ textarea {
 .novogen-flash .device-alerts ul {
   color: #a9d1ee;
 }
+.agenda-button {
+  margin: 16px 0 12px;
+  background: linear-gradient(110deg, #086d84, #0e6bba);
+}
+.connect-social .tiktok {
+  background: #071326;
+  border: 1px solid #4e7192;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  font-size: 28px;
+  line-height: 1;
+}
+.connect-social button.tiktok:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.install-connect {
+  margin-top: 18px;
+}
+.install-connect > button {
+  border: 1px solid #306d96;
+  border-radius: 20px;
+  padding: 9px 16px;
+  background: transparent;
+  color: #72cceb;
+  font-size: 11px;
+  cursor: pointer;
+}
+.install-connect > div {
+  margin: 15px 0;
+  background: #0b213c;
+  border: 1px solid #31587b;
+  border-radius: 10px;
+  padding: 15px;
+}
+.install-connect p {
+  color: #b0c8e5;
+  font-size: 11px;
+}
+.install-connect > div > button {
+  border: 0;
+  background: transparent;
+  color: #4bd2ef;
+  padding: 8px;
+  cursor: pointer;
+}
+.button-metrics-table {
+  margin-top: 20px;
+}
+.button-metrics-table td {
+  white-space: normal;
+}

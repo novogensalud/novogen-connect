@@ -1,4 +1,5 @@
 "use server";
+import { channelSchema } from "@/lib/channels";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
@@ -230,5 +231,31 @@ export async function readNotification(f: FormData) {
   revalidatePath("/crm");
   redirect(
     `/crm?org=${org}&view=automation&notice=${error ? "error" : "saved"}`,
+  );
+}
+
+export async function saveChannels(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const parsed = channelSchema.safeParse(Object.fromEntries(f));
+  if (!parsed.success) back(org, "invalid");
+  const { data, error } = await db
+    .from("public_channels")
+    .select("organization_id")
+    .eq("organization_id", org)
+    .maybeSingle();
+  if (error) back(org, "error");
+  const result = data
+    ? await db
+        .from("public_channels")
+        .update(parsed.data)
+        .eq("organization_id", org)
+    : await db
+        .from("public_channels")
+        .insert({ organization_id: org, ...parsed.data });
+  revalidatePath("/crm");
+  revalidatePath("/connect", "layout");
+  redirect(
+    `/crm?org=${org}&view=catalog&notice=${result.error ? "error" : "saved"}`,
   );
 }

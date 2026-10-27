@@ -19,14 +19,32 @@ export async function POST(request: Request) {
     return Response.json({ stored: false, mode: "demo" }, { status: 202 });
   const p = input.data;
   const db = await supabase();
-  const { error } = await db.rpc("record_interaction", {
+  const payload = {
     p_slug: p.slug,
     p_id: p.id,
     p_session: p.session,
     p_kind: p.kind,
     p_service: p.service ?? null,
     p_code: p.point ?? null,
+  };
+  let { error } = await db.rpc("record_interaction", {
+    ...payload,
+    p_target: p.target ?? null,
   });
+  if (
+    error?.code === "PGRST202" &&
+    [
+      "page_view",
+      "service_view",
+      "whatsapp_click",
+      "email_click",
+      "website_click",
+      "contact_started",
+    ].includes(p.kind)
+  ) {
+    const legacy = await db.rpc("record_interaction", payload);
+    error = legacy.error;
+  }
   return Response.json(
     { stored: !error },
     { status: error ? 503 : 202, headers: { "Cache-Control": "no-store" } },

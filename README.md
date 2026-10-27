@@ -97,3 +97,7 @@ Las pruebas de navegador configuran variables Supabase vacías en su propio serv
 ## Seguimiento y notificaciones
 
 Nueva vista **Seguimiento y métricas**, recordatorios internos cada hora, indicador rojo a las 24 horas, estado privado de solicitudes para clientes y métricas opcionales propias de CONNECT. Requiere migración 003; el programador horario se activa por separado. Consulta [activación, pruebas y límites](docs/followup-and-notifications.md). WhatsApp/correo automáticos, Web Push con la app cerrada y PostHog todavía no están conectados.
+
+## Servicios individuales y botones de FLASH
+
+La migración 004 añade las tres fichas RECOVERY y siete GLOW recuperadas del proyecto original, la configuración central de canales y el desglose de interacción por botón y servicio. [Activación y alcance de la medición](docs/catalogue-and-flash-tracking.md). TikTok requiere su URL oficial; no se inventa un perfil. Usar el CONNECT actualizado para medir los accesos; el sitio estático antiguo permanece separado.

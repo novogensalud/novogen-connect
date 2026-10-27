@@ -28,7 +28,7 @@ export function TrackingConsent({
     } catch {
       return;
     }
-    function send(kind: Kind, service?: string) {
+    function send(kind: Kind, service?: string, target?: string) {
       const payload = {
         slug,
         id: crypto.randomUUID(),
@@ -36,6 +36,7 @@ export function TrackingConsent({
         kind,
         service: service ?? null,
         point: point && /^[a-f0-9]{32}$/.test(point) ? point : null,
+        target: target ?? null,
         consent: true,
       };
       const body = JSON.stringify(payload);
@@ -60,7 +61,11 @@ export function TrackingConsent({
           ? event.target.closest<HTMLElement>("[data-connect-event]")
           : null;
       if (target)
-        send(target.dataset.connectEvent as Kind, target.dataset.serviceId);
+        send(
+          target.dataset.connectEvent as Kind,
+          target.dataset.serviceId,
+          target.dataset.connectTarget,
+        );
     };
     const focus = (event: FocusEvent) => {
       if (
@@ -72,10 +77,15 @@ export function TrackingConsent({
         send("contact_started");
       }
     };
-    document.addEventListener("click", click);
+    document.addEventListener("click", click, true);
+    const auxiliary = (event: MouseEvent) => {
+      if (event.button === 1) click(event);
+    };
+    document.addEventListener("auxclick", auxiliary, true);
     document.addEventListener("focusin", focus);
     return () => {
-      document.removeEventListener("click", click);
+      document.removeEventListener("click", click, true);
+      document.removeEventListener("auxclick", auxiliary, true);
       document.removeEventListener("focusin", focus);
     };
   }, [choice, slug, point]);
@@ -91,7 +101,8 @@ export function TrackingConsent({
         <>
           <p>
             ¿Permites medir el uso de CONNECT? Registramos visitas y clics sin
-            nombres, correos ni información clínica. Puedes usar el formulario
+            nombres, correos ni información clínica. Los botones para rechazar o
+            desactivar métricas no se registran. Puedes usar el formulario
             aunque rechaces las métricas.
           </p>
           <div>

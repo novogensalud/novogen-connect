@@ -4,10 +4,11 @@ import {
   interactionKinds,
   interactionLabels,
   notificationLabels,
+  targetLabels,
   type FollowupTask,
   type CommercialNotification,
 } from "@/lib/automation";
-import type { Lead } from "@/lib/domain";
+import type { Lead, Service } from "@/lib/domain";
 import {
   saveFollowupSettings,
   updateFollowup,
@@ -18,15 +19,22 @@ export async function AutomationPanel({
   role,
   demo,
   leads,
+  services,
 }: {
   org: string;
   role: string;
   demo: boolean;
   leads: Lead[];
+  services: Service[];
 }) {
   let tasks: FollowupTask[] = [];
   let notifications: CommercialNotification[] = [];
-  let metrics: { kind: string }[] = [];
+  let metrics: {
+    kind: string;
+    target?: string | null;
+    service_id?: string | null;
+  }[] = [];
+  let detailedMetrics = true;
   let minutes = 60;
   if (!demo) {
     const db = await supabase();
@@ -67,13 +75,25 @@ export async function AutomationPanel({
         .is("read_at", null)
         .order("created_at", { ascending: false })
         .limit(30),
-      db
-        .from("interaction_events")
-        .select("kind")
-        .eq("organization_id", org)
-        .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString())
-        .order("created_at", { ascending: false })
-        .limit(1000),
+      (async () => {
+        const query = (columns: string) =>
+          db
+            .from("interaction_events")
+            .select(columns)
+            .eq("organization_id", org)
+            .gte(
+              "created_at",
+              new Date(Date.now() - 7 * 86400000).toISOString(),
+            )
+            .order("created_at", { ascending: false })
+            .limit(1000);
+        const result = await query("kind,target,service_id");
+        if (result.error && ["42703", "PGRST204"].includes(result.error.code)) {
+          detailedMetrics = false;
+          return query("kind,service_id");
+        }
+        return result;
+      })(),
       db
         .from("followup_settings")
         .select("reminder_minutes")
@@ -89,7 +109,7 @@ export async function AutomationPanel({
       );
     tasks = result[0].data ?? [];
     notifications = result[1].data ?? [];
-    metrics = result[2].data ?? [];
+    metrics = (result[2].data ?? []) as unknown as typeof metrics;
     minutes = result[3].data?.reminder_minutes ?? 60;
   }
   const orgInput = <input type="hidden" name="org" value={org} />;
@@ -136,9 +156,9 @@ export async function AutomationPanel({
         <p className="fine-print">
           Regla inicial: cada 1 hora. Las tareas se marcan en rojo a las 24
           horas sin avance comercial. Cambiarla afecta a las tareas nuevas y a
-          las que se reprogramen al cambiar de etapa. Los avisos vencidos se
-          generan al abrir el panel o durante la revisión cada minuto; no hay un
-          proceso externo activo con la aplicación cerrada.
+          las que se reprogramen al cambiar de etapa. El panel revisa cada
+          minuto y el programador de Supabase, cuando está activado, genera
+          avisos internos aunque la aplicación esté cerrada.
         </p>
       </section>
       <section className="panel form-panel">
@@ -252,6 +272,78 @@ export async function AutomationPanel({
               <span>{interactionLabels[kind]}</span>
             </article>
           ))}
+        </div>
+        {!detailedMetrics && (
+          <div className="notice">
+            Ejecuta la migración 004 para distinguir todos los botones, agenda,
+            Instagram y TikTok.
+          </div>
+        )}
+        <div className="table-scroll button-metrics-table">
+          <table>
+            <caption>Accesos por botón de CONNECT FLASH</caption>
+            <thead>
+              <tr>
+                <th>BOTÓN</th>
+                <th>CLICS</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(targetLabels).map(([target, label]) => (
+                <tr key={target}>
+                  <td>{label}</td>
+                  <td>{metrics.filter((m) => m.target === target).length}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="table-scroll button-metrics-table">
+          <table>
+            <caption>Interacción con cada servicio</caption>
+            <thead>
+              <tr>
+                <th>SERVICIO</th>
+                <th>FICHA</th>
+                <th>ORIENTACIÓN</th>
+                <th>AGENDA</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.map((service) => (
+                <tr key={service.id}>
+                  <td>{service.name}</td>
+                  <td>
+                    {
+                      metrics.filter(
+                        (m) =>
+                          m.service_id === service.id &&
+                          m.kind === "service_view",
+                      ).length
+                    }
+                  </td>
+                  <td>
+                    {
+                      metrics.filter(
+                        (m) =>
+                          m.service_id === service.id &&
+                          m.target === "service_contact",
+                      ).length
+                    }
+                  </td>
+                  <td>
+                    {
+                      metrics.filter(
+                        (m) =>
+                          m.service_id === service.id &&
+                          m.kind === "agenda_click",
+                      ).length
+                    }
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <p className="fine-print">
           Sin PostHog: medición propia de CONNECT. WhatsApp y correo registran

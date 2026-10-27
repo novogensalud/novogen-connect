@@ -1,3 +1,4 @@
+import recoveredServices from "./recovered-services.json";
 import type { Organization, Service, Lead, Point } from "./domain";
 export const demoOrg: Organization = {
   id: "demo",
@@ -60,6 +61,14 @@ export const demoServices: Service[] = [
       "Información comercial sobre seguimiento y suscripciones. Sin registro de información clínica.",
     active: true,
   },
+  ...recoveredServices.map((s, i) => ({
+    id: `20000000-0000-4000-8000-${String(i + 1).padStart(12, "0")}`,
+    name: s.name,
+    category: "OPTIMIZA",
+    subcategory: s.subcategory,
+    description: s.description,
+    active: true,
+  })),
 ];
 export const demoLeads: Lead[] = [
   {

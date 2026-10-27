@@ -1,3 +1,9 @@
+import { InstallApp } from "@/components/install-app";
+import {
+  emptyChannels,
+  novogenChannels,
+  type PublicChannels,
+} from "@/lib/channels";
 import { TrackingConsent } from "@/components/tracking-consent";
 import { DeviceAlerts } from "@/components/device-alerts";
 import Link from "next/link";
@@ -57,6 +63,19 @@ export default async function Flash({
     services = result.data ?? [];
   }
   const novogen = slug === "novogen";
+  let channels: PublicChannels = novogen ? novogenChannels : emptyChannels;
+  if (!demo) {
+    const db = await supabase();
+    const result = await db
+      .from("public_channels")
+      .select("*")
+      .eq("organization_id", org.id)
+      .maybeSingle();
+    if (result.error && !["PGRST205", "42P01"].includes(result.error.code))
+      throw new Error("No se pudieron cargar los canales");
+    if (!result.error) channels = result.data ?? emptyChannels;
+  }
+
   const selected = services.some((s) => s.id === query.service)
     ? query.service
     : "";
@@ -86,7 +105,12 @@ export default async function Flash({
               <small>CONNECT</small>
             </h1>
           )}
-          <Link href="/crm" className="team-access">
+          <Link
+            href="/crm"
+            className="team-access"
+            data-connect-event="button_click"
+            data-connect-target="team_access"
+          >
             Acceso equipo <ArrowUpRight size={13} />
           </Link>
         </header>
@@ -106,7 +130,12 @@ export default async function Flash({
             <em>AYUDARTE?</em>
           </h1>
           <nav className="connect-tiles" aria-label="Accesos FLASH">
-            <a href="#contacto" className="connect-tile orient">
+            <a
+              href="#contacto"
+              className="connect-tile orient"
+              data-connect-event="button_click"
+              data-connect-target="orientame"
+            >
               <span className="tile-icon">
                 <Compass size={40} />
               </span>
@@ -115,59 +144,114 @@ export default async function Flash({
                 <ArrowRight size={19} />
               </span>
             </a>
-            <a href="#servicios" className="connect-tile">
+            <a
+              href="#servicios"
+              className="connect-tile"
+              data-connect-event="button_click"
+              data-connect-target="services"
+            >
               <span className="tile-icon">
                 <Heart size={32} />
               </span>
               <strong>SERVICIOS</strong>
             </a>
-            <a href="#promos" className="connect-tile">
+            <a
+              href="#promos"
+              className="connect-tile"
+              data-connect-event="button_click"
+              data-connect-target="promos"
+            >
               <span className="tile-icon">
                 <Tag size={32} />
               </span>
               <strong>PROMOS</strong>
             </a>
           </nav>
-          {novogen && (
-            <>
-              <div className="connect-social">
-                <a
-                  href="https://www.instagram.com/novogen.temuco"
-                  aria-label="Instagram de NOVOGEN"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Instagram size={24} />
-                </a>
-                <a
-                  className="whatsapp"
-                  data-connect-event="whatsapp_click"
-                  href="https://wa.me/56944683094"
-                  aria-label="WhatsApp de NOVOGEN"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MessageCircle size={25} />
-                </a>
-                <a
-                  href="mailto:novogen.temuco@gmail.com"
-                  data-connect-event="email_click"
-                  aria-label="Correo de NOVOGEN"
-                >
-                  @
-                </a>
-              </div>
+          <div className="connect-social">
+            {channels.instagram_url && (
               <a
-                className="institution-button"
-                data-connect-event="website_click"
-                href="https://novogensalud.cl/"
+                href={channels.instagram_url}
+                aria-label="Instagram"
                 target="_blank"
                 rel="noopener noreferrer"
+                data-connect-event="instagram_click"
+                data-connect-target="instagram"
               >
-                IR A NOVOGEN <ArrowRight size={22} />
+                <Instagram size={24} />
               </a>
-            </>
+            )}
+            {channels.tiktok_url ? (
+              <a
+                href={channels.tiktok_url}
+                className="tiktok"
+                aria-label="TikTok"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-connect-event="tiktok_click"
+                data-connect-target="tiktok"
+              >
+                ♪
+              </a>
+            ) : (
+              <button
+                type="button"
+                className="tiktok"
+                disabled
+                aria-label="TikTok: enlace pendiente"
+                title="Enlace de TikTok pendiente"
+              >
+                ♪
+              </button>
+            )}
+            {channels.whatsapp_url && (
+              <a
+                href={channels.whatsapp_url}
+                className="whatsapp"
+                aria-label="WhatsApp"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-connect-event="whatsapp_click"
+                data-connect-target="whatsapp"
+              >
+                <MessageCircle size={25} />
+              </a>
+            )}
+            {channels.email && (
+              <a
+                href={`mailto:${channels.email}`}
+                aria-label="Correo"
+                data-connect-event="email_click"
+                data-connect-target="email"
+              >
+                @
+              </a>
+            )}
+          </div>
+          {channels.agenda_url && (
+            <a
+              className="institution-button agenda-button"
+              href={channels.agenda_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-connect-event="agenda_click"
+              data-connect-target="agenda"
+            >
+              AGENDAR ATENCIÓN <ArrowUpRight size={22} />
+            </a>
           )}
+          {channels.website_url && (
+            <a
+              className="institution-button"
+              href={channels.website_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-connect-event="website_click"
+              data-connect-target="website"
+            >
+              IR A {org.name} <ArrowRight size={22} />
+            </a>
+          )}
+          <InstallApp />
           <p className="connect-credit">
             Una plataforma de <strong>SOLVEX</strong>
           </p>
@@ -191,6 +275,7 @@ export default async function Flash({
                 <p>{s.description}</p>
                 <ServiceInfo
                   service={s}
+                  agendaUrl={channels.agenda_url}
                   contactHref={`?${new URLSearchParams({ service: s.id, ...(query.point ? { point: query.point } : {}) })}#contacto`}
                 />
               </article>
@@ -315,7 +400,11 @@ export default async function Flash({
                 Puedes solicitar la eliminación de tu contacto a través de los
                 canales institucionales.
               </p>
-              <button className="institution-button">
+              <button
+                className="institution-button"
+                data-connect-event="button_click"
+                data-connect-target="contact_submit"
+              >
                 {demo
                   ? "Probar formulario de demostración"
                   : "Solicitar contacto"}
@@ -327,7 +416,11 @@ export default async function Flash({
         <TrackingConsent slug={slug} point={query.point} />
         <footer className="connect-footer">
           <span>CONNECT · SOLVEX</span>
-          <Link href="/crm">
+          <Link
+            href="/crm"
+            data-connect-event="button_click"
+            data-connect-target="crm_access"
+          >
             {demo ? "Explorar CRM de demostración" : "Acceso al CRM"}
           </Link>
         </footer>

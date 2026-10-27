@@ -1,0 +1,62 @@
+[
+  {
+    "source_id": "essential",
+    "subcategory": "RECOVERY",
+    "name": "RECOVERY · Essential",
+    "description": "Vitaminas B por vía intramuscular."
+  },
+  {
+    "source_id": "advance",
+    "subcategory": "RECOVERY",
+    "name": "RECOVERY · Advance",
+    "description": "Vitaminas B por vía endovenosa."
+  },
+  {
+    "source_id": "premium",
+    "subcategory": "RECOVERY",
+    "name": "RECOVERY · Premium",
+    "description": "Evaluación y terapia personalizada."
+  },
+  {
+    "source_id": "limpieza",
+    "subcategory": "GLOW",
+    "name": "GLOW · Limpieza facial",
+    "description": "Limpieza profunda y cuidado facial profesional."
+  },
+  {
+    "source_id": "regeneracion",
+    "subcategory": "GLOW",
+    "name": "GLOW · Regeneración y calidad de la piel",
+    "description": "Mejora la textura, hidratación y luminosidad."
+  },
+  {
+    "source_id": "manchas",
+    "subcategory": "GLOW",
+    "name": "GLOW · Manchas y tono irregular",
+    "description": "Mejora la apariencia de manchas y unifica el tono."
+  },
+  {
+    "source_id": "ojeras",
+    "subcategory": "GLOW",
+    "name": "GLOW · Ojeras y bolsas",
+    "description": "Revitaliza la apariencia del contorno de ojos."
+  },
+  {
+    "source_id": "labial",
+    "subcategory": "GLOW",
+    "name": "GLOW · Regeneración labial",
+    "description": "Hidratación y calidad del labio, sin relleno."
+  },
+  {
+    "source_id": "rojeces",
+    "subcategory": "GLOW",
+    "name": "GLOW · Rojeces y apariencia vascular",
+    "description": "Cuida las pieles con tendencia al enrojecimiento."
+  },
+  {
+    "source_id": "capilar",
+    "subcategory": "GLOW",
+    "name": "GLOW · Caída y fortalecimiento capilar",
+    "description": "Apoya la calidad del cuero cabelludo y del cabello."
+  }
+]

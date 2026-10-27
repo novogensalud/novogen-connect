@@ -125,6 +125,8 @@ export function DeviceAlerts({
       </div>
       <button
         type="button"
+        data-connect-event="button_click"
+        data-connect-target={allowed ? "device_pause" : "device_enable"}
         onClick={() => {
           if (allowed) {
             setAllowed(false);

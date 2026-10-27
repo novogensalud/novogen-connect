@@ -207,3 +207,79 @@ test("commercial automation, independent follow-up category and PWA are visible"
   });
   expect(bad.status()).toBe(400);
 });
+
+test("FLASH attributes every commercial control and counts agenda and social clicks", async ({
+  page,
+}) => {
+  const events: Record<string, unknown>[] = [];
+  await page.route("**/api/interactions", async (route) => {
+    events.push(route.request().postDataJSON());
+    await route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: '{"stored":false}',
+    });
+  });
+  await page.goto("/connect/novogen");
+  await page
+    .getByRole("button", { name: "Permitir métricas", exact: true })
+    .click();
+  await page.evaluate(() =>
+    document.addEventListener(
+      "click",
+      (event) => {
+        const link =
+          event.target instanceof Element ? event.target.closest("a") : null;
+        if (
+          link &&
+          (link.target === "_blank" || link.href.startsWith("mailto:"))
+        )
+          event.preventDefault();
+      },
+      { capture: true },
+    ),
+  );
+  for (const [name, target] of [
+    ["Instagram", "instagram"],
+    ["WhatsApp", "whatsapp"],
+    ["AGENDAR ATENCIÓN", "agenda"],
+    ["IR A NOVOGEN", "website"],
+  ]) {
+    await page.getByRole("link", { name, exact: true }).click();
+    await expect
+      .poll(() =>
+        events.some((e) => e.target === target && e.kind === target + "_click"),
+      )
+      .toBe(true);
+  }
+  await expect(
+    page.getByRole("button", { name: "TikTok: enlace pendiente" }),
+  ).toBeDisabled();
+  for (const [name, target] of [
+    ["ORIÉNTAME", "orientame"],
+    ["SERVICIOS", "services"],
+    ["PROMOS", "promos"],
+  ]) {
+    await page.getByRole("link", { name, exact: true }).click();
+    await expect.poll(() => events.some((e) => e.target === target)).toBe(true);
+  }
+  const missing = await page
+    .locator(".novogen-flash a,.novogen-flash button")
+    .evaluateAll((nodes) =>
+      nodes
+        .filter(
+          (node) =>
+            !node.closest(".tracking-choice") &&
+            !node.hasAttribute("disabled") &&
+            !node.hasAttribute("data-connect-target"),
+        )
+        .map((node) => node.textContent),
+    );
+  expect(missing).toEqual([]);
+  await expect(
+    page.getByRole("heading", { name: "RECOVERY · Essential", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "GLOW · Limpieza facial", exact: true }),
+  ).toBeVisible();
+});

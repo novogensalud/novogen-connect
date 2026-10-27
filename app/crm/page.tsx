@@ -1,3 +1,4 @@
+import { ChannelSettings } from "@/components/channel-settings";
 import { DeviceAlerts } from "@/components/device-alerts";
 import { AutomationPanel } from "@/components/automation-panel";
 import Link from "next/link";
@@ -301,6 +302,7 @@ export default async function Dashboard({
               role={role}
               demo={demo}
               leads={leads}
+              services={services}
             />
           )}
           {view === "overview" && (
@@ -592,6 +594,9 @@ export default async function Dashboard({
                 )}
               </form>
             </section>
+          )}
+          {view === "catalog" && role === "admin" && (
+            <ChannelSettings org={org.id} slug={org.slug} demo={demo} />
           )}
           {view === "catalog" && (
             <>
