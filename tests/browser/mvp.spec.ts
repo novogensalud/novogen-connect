@@ -1,0 +1,122 @@
+import { test, expect } from "@playwright/test";
+test("dashboard navigation, search and honest demo controls", async ({
+  page,
+}) => {
+  await page.goto("/crm");
+  await expect(
+    page.getByRole("heading", { name: "Cada conexión cuenta." }),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "CRM comercial", exact: true }).click();
+  await page
+    .getByRole("textbox", { name: "Buscar contacto" })
+    .fill("contacto.a@example.com");
+  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await expect(
+    page.getByText("Contacto de ejemplo A", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Contacto de ejemplo B", { exact: true }),
+  ).toHaveCount(0);
+  await page.getByRole("link", { name: "Catálogo", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Agregar servicio", exact: true }),
+  ).toBeDisabled();
+  await page.getByRole("link", { name: "Puntos CONNECT", exact: true }).click();
+  const response = await page.request.get("/api/qr/demo-recepcion");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("image/svg+xml");
+  expect(await response.text()).toContain("<svg");
+});
+test("mobile FLASH, service dialog and commercial form", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/connect/novogen");
+  await expect(
+    page.getByRole("navigation", { name: "Accesos FLASH" }),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.getByRole("button", { name: "Más información" }).first().click();
+  await expect(page.getByRole("dialog").first()).toBeVisible();
+  await page
+    .getByRole("button", { name: "Cerrar", exact: true })
+    .first()
+    .click();
+  await expect(page.getByRole("dialog").first()).not.toBeVisible();
+  await page
+    .getByRole("textbox", { name: "Nombre", exact: true })
+    .fill("Persona Prueba");
+  await page
+    .getByRole("textbox", { name: "Correo electrónico", exact: true })
+    .fill("prueba@example.com");
+  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("button", { name: "Probar formulario de demostración" })
+    .click();
+  await expect(page.getByRole("status")).toContainText(
+    "No se guardaron ni enviaron tus datos",
+  );
+  await page.screenshot({
+    path: "/tmp/novogen-flash-mobile.png",
+    fullPage: true,
+  });
+});
+test("point routes resolve safely and unknown organizations do not exist", async ({
+  request,
+  page,
+}) => {
+  const route = await request.get("/r/demo-recepcion", { maxRedirects: 0 });
+  expect(route.status()).toBe(303);
+  expect(route.headers().location).toContain(
+    "/connect/novogen?point=demo-recepcion",
+  );
+  expect((await request.get("/r/unknown")).status()).toBe(404);
+  await page.goto("/connect/no-existe");
+  await expect(
+    page.getByRole("heading", { name: "Este espacio no está disponible." }),
+  ).toBeVisible();
+});
+test("desktop dashboard fits its viewport", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/crm");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({ path: "/tmp/novogen-dashboard.png", fullPage: true });
+});
+
+test("CONNECT home uses organization branding and leads to the CRM", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/connect\/novogen/);
+  await expect(page.locator(".connect-credit")).toContainText("SOLVEX");
+  await expect(page.locator("body")).not.toContainText("Francisco Ortiz");
+  await page.getByRole("button", { name: "Más información" }).first().click();
+  await page
+    .getByRole("link", { name: "Solicitar orientación", exact: true })
+    .first()
+    .click();
+  await expect(page.getByLabel("¿Qué te interesa?")).toHaveValue(
+    "10000000-0000-4000-8000-000000000001",
+  );
+  await page.getByRole("link", { name: "Acceso equipo", exact: true }).click();
+  await page.getByRole("link", { name: "CRM comercial", exact: true }).click();
+  await page
+    .getByRole("combobox", { name: "Filtrar etapa" })
+    .selectOption("qualified");
+  await page.getByRole("button", { name: "Buscar", exact: true }).click();
+  await expect(
+    page.getByText("Contacto de ejemplo C", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Contacto de ejemplo A", { exact: true }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Crear contacto", exact: true }),
+  ).toBeDisabled();
+});
