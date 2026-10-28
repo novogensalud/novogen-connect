@@ -41,3 +41,19 @@ Destinos admitidos: agenda, instagram, tiktok, whatsapp, email, website. No se e
 El colector web valida el origen HTTP contra el sitio configurado y la función SQL vuelve a comprobarlo. Los eventos web no pueden incluir servicio ni punto QR. El cliente usa sesión anónima sin cookies del CRM. Los eventos son idempotentes por UUID y tienen límite de 100 por sesión/organización/día, compartido con FLASH. Las políticas de lectura siguen limitadas a miembros de la organización. Como cualquier analítica pública, esto no autentica a un visitante ni elimina tráfico artificial.
 
 En una prueba autorizada, aceptar métricas en cada origen, abrir un enlace y comparar el dashboard. El filtro de canales afecta las tarjetas, gráfico diario, botones y servicios; la tarjeta de comparación conserva ambos canales para comparar el mismo período. No se consideran reservas, mensajes entregados ni ventas. Sin eventos web recientes se muestra ese estado, sin afirmar que la instrumentación está instalada o desconectada.
+
+## Integración elegida: Complianz (28 de octubre de 2026)
+
+La inspección del HTML público de novogensalud.cl encontró un enlace a la política de cookies, pero no identificadores de Complianz, CookieYes, Cookiebot, OneTrust o Moove. Esto no demuestra que no exista otro gestor cargado dinámicamente. Antes de activar un nuevo banner, revisar Plugins del administrador.
+
+Se eligió Complianz gratuito del directorio oficial: https://wordpress.org/plugins/complianz-gdpr/ . El paquete propio `integrations/wordpress/novogen-connect-cookies.zip` solo conecta el gestor con CONNECT; no sustituye Complianz ni incorpora sus archivos. Se instala desde Plugins → Añadir nuevo → Subir plugin. En Ajustes → CONNECT · Cookies se configura el origen público HTTPS del colector; viene vacío para no instalar un Preview protegido por error. No necesita claves ni contraseñas.
+
+Activar modo **opt-in** para todos los visitantes, sin habilitar estadísticas por defecto ni `forceEnableStats`. La variante del script con `data-consent="complianz"` consulta el consentimiento de Estadísticas y exige cookie `allow`; evita heredar los permisos implícitos del modo opt-out o exenciones de robots. Escucha cambios, carga del banner y revocación. En cada envío vuelve a comprobar el permiso por si caducó o fue retirado en otra pestaña. La preferencia la guarda Complianz: CONNECT no crea otra cookie ni otro banner. La sesión anónima de analítica se genera solo al aceptar, en sessionStorage.
+
+```html
+<script defer src="ORIGEN_CONNECT/web-tracker.js" data-slug="novogen" data-consent="complianz"></script>
+```
+
+No se ha instalado el complemento en la web real: este entorno no tiene una conexión administrativa a WordPress. Tampoco se ha retirado la protección del Preview. Quedan como pasos externos: instalar/configurar Complianz y el ZIP, disponer de origen público aprobado y comprobar aceptación → evento web → revocación en el sitio real. No debe presentarse como conexión activa hasta esa comprobación.
+
+Referencia técnica revisada: https://github.com/Really-Simple-Plugins/complianz-gdpr/blob/master/cookiebanner/js/complianz.js (`cmplz_get_cookie`, `cmplz_has_consent`, `cmplz_status_change`, `cmplz_revoke`).

@@ -450,16 +450,15 @@ export function MetricsDashboard({
           <Globe2 size={18} /> Conectar el seguimiento de WordPress
         </summary>
         <p>
-          Instala el script en el sitio institucional y vincula el
-          consentimiento de tu gestor de cookies. No registra nada hasta recibir
-          autorización explícita.
+          Conecta Complianz con consentimiento previo de Estadísticas. El
+          seguimiento respeta la aceptación guardada y se detiene al revocarla,
+          sin mostrar otro aviso de cookies.
         </p>
-        <code>{`<script defer src="https://novogen-connect-pruebas-novogen1.vercel.app/web-tracker.js" data-slug="${slug}"></script>`}</code>
+        <code>{`<script defer src="https://novogen-connect-pruebas-novogen1.vercel.app/web-tracker.js" data-slug="${slug}" data-consent="complianz"></script>`}</code>
         <p>
-          Al aceptar métricas:{" "}
-          <code>window.CONNECTMetrics?.setConsent(true)</code>. Al revocarlas:{" "}
-          <code>window.CONNECTMetrics?.setConsent(false)</code>. El script debe
-          haber cargado antes de comunicar el consentimiento.
+          Configura Complianz en modo opt-in y exige aceptación para
+          Estadísticas. No habilites estadísticas sin consentimiento. También
+          puedes instalar el complemento de integración de NOVOGEN desde GitHub.
         </p>
         <p>
           Marca el botón de reserva con{" "}
