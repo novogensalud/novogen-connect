@@ -85,3 +85,14 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - No desplegado todavía: la CLI encontró la sesión Vercel caducada. La autorización interactiva está pendiente; no se movió el alias ni se afirma que la nueva interfaz esté publicada.
 - Activación de base existente: migración `202610280005_metrics_sources.sql`, una sola vez después de 004. El origen FLASH se conserva para todos los eventos históricos, porque el único colector anterior era FLASH.
 - WordPress no fue modificado: script e instrucciones en `docs/analytics-sources.md`, con consentimiento explícito y dominio permitido. El Preview protegido no permite recibir seguimiento externo de producción; requiere un origen público aprobado.
+
+## Dashboard por origen desplegado — 28 de octubre de 2026
+
+- La autorización Vercel se completó; CLI reconoció la cuenta NOVOGEN sin solicitar otro código.
+- Código funcional `629ed60`, con documentación `fd46165`, rama `feature/connect-crm`.
+- Preview Ready: `dpl_4tD8197rqzRbF1tP8zXu3P4HUztU`.
+- URL inmutable: https://novogen-connect-7lzoxoja8-novogen1.vercel.app
+- Alias estable actualizado tras verificar el Preview: https://novogen-connect-pruebas-novogen1.vercel.app
+- Comprobación remota mediante acceso oficial Vercel: health 200, login 200 con formulario real, CRM sin sesión 307 a login y script WordPress 200. Se mantiene protección Vercel y autenticación Supabase.
+- La base real todavía responde 42703 al consultar la columna source: migración 005 pendiente. La interfaz conserva compatibilidad con métricas FLASH anteriores e informa la activación pendiente.
+- No se instalaron scripts en WordPress, no se publicaron datos ni se desactivó protección del Preview. El seguimiento externo requiere instalar el colector en un origen público aprobado y vincular consentimiento.
