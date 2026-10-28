@@ -1,10 +1,9 @@
 import Link from "next/link";
+import { MetricsDashboard } from "./metrics-dashboard";
+import type { MetricEvent } from "@/lib/analytics";
 import { supabase } from "@/lib/supabase";
 import {
-  interactionKinds,
-  interactionLabels,
   notificationLabels,
-  targetLabels,
   type FollowupTask,
   type CommercialNotification,
 } from "@/lib/automation";
@@ -20,7 +19,9 @@ export async function AutomationPanel({
   demo,
   leads,
   services,
+  slug,
 }: {
+  slug: string;
   org: string;
   role: string;
   demo: boolean;
@@ -29,12 +30,10 @@ export async function AutomationPanel({
 }) {
   let tasks: FollowupTask[] = [];
   let notifications: CommercialNotification[] = [];
-  let metrics: {
-    kind: string;
-    target?: string | null;
-    service_id?: string | null;
-  }[] = [];
+  let metrics: MetricEvent[] = [];
   let detailedMetrics = true;
+  let sourceReady = true;
+  let truncated = false;
   let minutes = 60;
   if (!demo) {
     const db = await supabase();
@@ -83,14 +82,20 @@ export async function AutomationPanel({
             .eq("organization_id", org)
             .gte(
               "created_at",
-              new Date(Date.now() - 7 * 86400000).toISOString(),
+              new Date(Date.now() - 31 * 86400000).toISOString(),
             )
             .order("created_at", { ascending: false })
-            .limit(1000);
-        const result = await query("kind,target,service_id");
+            .limit(1001);
+        let result = await query(
+          "kind,target,service_id,source,created_at,session_id",
+        );
+        if (result.error && ["42703", "PGRST204"].includes(result.error.code)) {
+          sourceReady = false;
+          result = await query("kind,target,service_id,created_at,session_id");
+        }
         if (result.error && ["42703", "PGRST204"].includes(result.error.code)) {
           detailedMetrics = false;
-          return query("kind,service_id");
+          return query("kind,service_id,created_at,session_id");
         }
         return result;
       })(),
@@ -109,12 +114,24 @@ export async function AutomationPanel({
       );
     tasks = result[0].data ?? [];
     notifications = result[1].data ?? [];
-    metrics = (result[2].data ?? []) as unknown as typeof metrics;
+    const rows = (result[2].data ?? []) as unknown as MetricEvent[];
+    truncated = rows.length >= 1000;
+    metrics = rows.slice(0, 1000);
     minutes = result[3].data?.reminder_minutes ?? 60;
   }
   const orgInput = <input type="hidden" name="org" value={org} />;
   return (
     <div className="automation-panel">
+      <MetricsDashboard
+        events={metrics}
+        services={services}
+        sourceReady={sourceReady}
+        detailedMetrics={detailedMetrics}
+        loadedAt={new Date().toISOString()}
+        truncated={truncated}
+        demo={demo}
+        slug={slug}
+      />
       <section className="panel form-panel">
         <h2>Asistente de seguimiento</h2>
         <p>
@@ -258,98 +275,6 @@ export async function AutomationPanel({
             activar la migración.
           </p>
         )}
-      </section>
-      <section className="panel form-panel">
-        <h2>Interacción web · últimos 7 días</h2>
-        <p>
-          Hasta 1.000 eventos consentidos recientes. Las métricas no acreditan
-          personas únicas, mensajes recibidos ni ventas.
-        </p>
-        <div className="analytics-grid">
-          {interactionKinds.map((kind) => (
-            <article key={kind}>
-              <strong>{metrics.filter((m) => m.kind === kind).length}</strong>
-              <span>{interactionLabels[kind]}</span>
-            </article>
-          ))}
-        </div>
-        {!detailedMetrics && (
-          <div className="notice">
-            Ejecuta la migración 004 para distinguir todos los botones, agenda,
-            Instagram y TikTok.
-          </div>
-        )}
-        <div className="table-scroll button-metrics-table">
-          <table>
-            <caption>Accesos por botón de CONNECT FLASH</caption>
-            <thead>
-              <tr>
-                <th>BOTÓN</th>
-                <th>CLICS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(targetLabels).map(([target, label]) => (
-                <tr key={target}>
-                  <td>{label}</td>
-                  <td>{metrics.filter((m) => m.target === target).length}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="table-scroll button-metrics-table">
-          <table>
-            <caption>Interacción con cada servicio</caption>
-            <thead>
-              <tr>
-                <th>SERVICIO</th>
-                <th>FICHA</th>
-                <th>ORIENTACIÓN</th>
-                <th>AGENDA</th>
-              </tr>
-            </thead>
-            <tbody>
-              {services.map((service) => (
-                <tr key={service.id}>
-                  <td>{service.name}</td>
-                  <td>
-                    {
-                      metrics.filter(
-                        (m) =>
-                          m.service_id === service.id &&
-                          m.kind === "service_view",
-                      ).length
-                    }
-                  </td>
-                  <td>
-                    {
-                      metrics.filter(
-                        (m) =>
-                          m.service_id === service.id &&
-                          m.target === "service_contact",
-                      ).length
-                    }
-                  </td>
-                  <td>
-                    {
-                      metrics.filter(
-                        (m) =>
-                          m.service_id === service.id &&
-                          m.kind === "agenda_click",
-                      ).length
-                    }
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="fine-print">
-          Sin PostHog: medición propia de CONNECT. WhatsApp y correo registran
-          el clic de salida; falta conectar sus proveedores para medir
-          conversaciones o entregas.
-        </p>
       </section>
       <Link className="inline-link" href={`/crm?org=${org}&view=crm`}>
         Ir a contactos y oportunidades →

@@ -298,6 +298,7 @@ export default async function Dashboard({
           />
           {view === "automation" && (
             <AutomationPanel
+              slug={org.slug}
               org={org.id}
               role={role}
               demo={demo}

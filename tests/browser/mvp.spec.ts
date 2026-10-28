@@ -190,7 +190,7 @@ test("commercial automation, independent follow-up category and PWA are visible"
     page.getByRole("button", { name: "Guardar regla", exact: true }),
   ).toBeDisabled();
   await expect(
-    page.getByText("Clics a WhatsApp desde CONNECT", { exact: true }),
+    page.getByText("WhatsApp", { exact: true }),
   ).toBeVisible();
   await page.getByRole("link", { name: "Catálogo", exact: true }).click();
   await expect(
@@ -282,4 +282,91 @@ test("FLASH attributes every commercial control and counts agenda and social cli
   await expect(
     page.getByRole("heading", { name: "GLOW · Limpieza facial", exact: true }),
   ).toBeVisible();
+});
+
+test("analytics dashboard filters sources and periods without inventing web events", async ({
+  page,
+}) => {
+  await page.goto("/crm?view=automation");
+  await expect(
+    page.getByRole("heading", { name: "Dos canales. Una visión clara." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Sitio web", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Sitio web", exact: true }),
+  ).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByText(
+      "La web mide visitas y accesos a canales. Las fichas de servicios corresponden a FLASH.",
+    ),
+  ).toBeVisible();
+  await page.getByLabel("Período de métricas").selectOption("30");
+  await expect(
+    page.getByRole("img", { name: "Actividad diaria: 0 eventos en 30 días" }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "CONNECT FLASH", exact: true })
+    .click();
+  await page.getByPlaceholder("RECOVERY, GLOW…").fill("Essential");
+  await expect(page.locator(".metrics-service-table tbody tr")).toHaveCount(1);
+  await page
+    .getByRole("checkbox", { name: "Automática", exact: true })
+    .uncheck();
+  await expect(page.getByText(/Actualización pausada/)).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+test("WordPress tracker requires explicit consent and stops after withdrawal", async ({
+  page,
+}) => {
+  const payloads: Record<string, unknown>[] = [];
+  await page.route("**/api/web-interactions", async (route) => {
+    payloads.push(route.request().postDataJSON());
+    await route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: '{"stored":true}',
+    });
+  });
+  await page.goto("/connect/novogen");
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const s = document.createElement("script");
+        s.src = "/web-tracker.js";
+        s.dataset.slug = "novogen";
+        s.onload = () => resolve();
+        s.onerror = () => reject(new Error("tracker load"));
+        document.head.appendChild(s);
+      }),
+  );
+  expect(payloads).toHaveLength(0);
+  await page.evaluate(() => {
+    (
+      window as unknown as { CONNECTMetrics: { setConsent(v: boolean): void } }
+    ).CONNECTMetrics.setConsent(true);
+  });
+  await expect.poll(() => payloads.length).toBe(1);
+  expect(payloads[0].kind).toBe("page_view");
+  await page.evaluate(() => {
+    const a = document.createElement("a");
+    a.dataset.connectTarget = "agenda";
+    a.href = "#test";
+    a.textContent = "Prueba agenda web";
+    document.body.appendChild(a);
+  });
+  await page.getByRole("link", { name: "Prueba agenda web" }).click();
+  await expect.poll(() => payloads.length).toBe(2);
+  expect(payloads[1].target).toBe("agenda");
+  await page.evaluate(() => {
+    (
+      window as unknown as { CONNECTMetrics: { setConsent(v: boolean): void } }
+    ).CONNECTMetrics.setConsent(false);
+  });
+  await page.getByRole("link", { name: "Prueba agenda web" }).click();
+  expect(payloads).toHaveLength(2);
 });

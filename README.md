@@ -101,3 +101,5 @@ Nueva vista **Seguimiento y métricas**, recordatorios internos cada hora, indic
 ## Servicios individuales y botones de FLASH
 
 La migración 004 añade las tres fichas RECOVERY y siete GLOW recuperadas del proyecto original, la configuración central de canales y el desglose de interacción por botón y servicio. [Activación y alcance de la medición](docs/catalogue-and-flash-tracking.md). TikTok requiere su URL oficial; no se inventa un perfil. Usar el CONNECT actualizado para medir los accesos; el sitio estático antiguo permanece separado.
+
+El dashboard separa sitio web y CONNECT FLASH, con filtros, actividad diaria y actualización automática. Ver [orígenes de analítica e instalación WordPress](docs/analytics-sources.md); la base existente requiere la migración 005.

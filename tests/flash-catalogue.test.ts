@@ -62,6 +62,7 @@ test("channel and service interaction migration preserves tenant boundaries and 
       "202610270002_manual_contacts.sql",
       "202610270003_followup_and_interactions.sql",
       "202610270004_flash_catalogue_and_buttons.sql",
+      "202610280005_metrics_sources.sql",
     ])
       await db.exec(
         await readFile(
@@ -206,6 +207,66 @@ test("channel and service interaction migration preserves tenant boundaries and 
           "select count(*)::int as n from public.interaction_events",
         );
         assert.equal(r.rows[0].n, 10);
+        await role("authenticated", ub);
+        assert.equal(
+          (await db.query("select * from public.interaction_events")).rows
+            .length,
+          0,
+        );
+      },
+    );
+    await t.test(
+      "web source requires configured website and remains separate from FLASH",
+      async () => {
+        const uuid = () => crypto.randomUUID();
+        const record = (
+          origin: string | null,
+          kind = "page_view",
+          target: string | null = null,
+          slug = "empresa-a",
+          id = uuid(),
+        ) =>
+          db.query("select public.record_web_interaction($1,$2,$3,$4,$5,$6)", [
+            slug,
+            id,
+            session,
+            kind,
+            target,
+            origin,
+          ]);
+        await role("anon");
+        for (const origin of [
+          null,
+          "https://attacker.example",
+          "http://example.com",
+          "https://example.com.evil",
+          "https://example.com/path",
+        ])
+          await assert.rejects(record(origin), /Invalid origin/);
+        await assert.rejects(
+          record("https://example.com", "button_click", "orientame"),
+          /Invalid event/,
+        );
+        await assert.rejects(
+          record("https://example.com", "agenda_click", "whatsapp"),
+          /Invalid event/,
+        );
+        await assert.rejects(
+          record("https://private.example.com", "page_view", null, "empresa-b"),
+          /Unavailable/,
+        );
+        const id = uuid();
+        await record("https://example.com", "page_view", null, "empresa-a", id);
+        await record("https://example.com", "page_view", null, "empresa-a", id);
+        await record("https://www.example.com", "agenda_click", "agenda");
+        await role("authenticated", ua);
+        const counts = await db.query<{ source: string; n: number }>(
+          "select source,count(*)::int as n from public.interaction_events group by source order by source",
+        );
+        assert.deepEqual(counts.rows, [
+          { source: "flash", n: 10 },
+          { source: "web", n: 2 },
+        ]);
         await role("authenticated", ub);
         assert.equal(
           (await db.query("select * from public.interaction_events")).rows
