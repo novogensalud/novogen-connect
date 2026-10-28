@@ -96,3 +96,17 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Comprobación remota mediante acceso oficial Vercel: health 200, login 200 con formulario real, CRM sin sesión 307 a login y script WordPress 200. Se mantiene protección Vercel y autenticación Supabase.
 - La base real todavía responde 42703 al consultar la columna source: migración 005 pendiente. La interfaz conserva compatibilidad con métricas FLASH anteriores e informa la activación pendiente.
 - No se instalaron scripts en WordPress, no se publicaron datos ni se desactivó protección del Preview. El seguimiento externo requiere instalar el colector en un origen público aprobado y vincular consentimiento.
+
+## App comercial y cookies de analítica — 28 de octubre de 2026
+
+- Código funcional `891bfc5` (app de equipo) y `98dda56` (integración Complianz), rama `feature/connect-crm`.
+- Preview Ready: `dpl_6VuMkjkKtxtzfoYLycyYKQgkCJF2`.
+- URL inmutable: https://novogen-connect-hcgmu4lww-novogen1.vercel.app
+- Alias estable actualizado después de comprobar el Preview: https://novogen-connect-pruebas-novogen1.vercel.app
+- Entrada al equipo: `/equipo`; autenticación Supabase y protección Vercel conservadas. La sesión expirada redirige a `/login?next=equipo`; el destino posterior al ingreso es fijo.
+- Comprobaciones remotas oficiales: health 200; ingreso comercial 200 con campo next=equipo; equipo sin sesión 307 al ingreso; manifiesto comercial 200 con start_url=/equipo; script de cookies 200 con validación de Estadísticas y eventos Complianz.
+- Validación local: 34 pruebas de lógica/base de datos aprobadas, 12 recorridos de navegador aprobados entre la ejecución completa y la repetición focalizada tras corregir la ruta del manifiesto. Build aprobado. Revisión visual de la vista móvil comercial.
+- Sin nueva migración. El usuario informó éxito de 005 y se comprobó la existencia de su función con rechazo de una organización inválida; las lecturas públicas de métricas siguen protegidas.
+- Notificaciones plegadas y voz local opcional, solo con app abierta; no llamadas ni mensajes externos. Destinatarios elegidos para una futura integración: todos los integrantes del equipo comercial.
+- Complemento de WordPress preparado en `integrations/wordpress/novogen-connect-cookies.zip`; requiere Complianz, configuración opt-in y origen de colector público aprobado. No instalado en WordPress; no se alteró su sitio ni se desactivó la protección Vercel.
+- La instalación real en WordPress, la prueba autenticada con prospectos reales, Web Push y el proveedor de llamadas WhatsApp permanecen pendientes. No se contrataron servicios ni se enviaron llamadas.
