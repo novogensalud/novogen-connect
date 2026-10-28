@@ -189,9 +189,7 @@ test("commercial automation, independent follow-up category and PWA are visible"
   await expect(
     page.getByRole("button", { name: "Guardar regla", exact: true }),
   ).toBeDisabled();
-  await expect(
-    page.getByText("WhatsApp", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByText("WhatsApp", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Catálogo", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "SEGUIMIENTO", exact: true }),
@@ -369,4 +367,136 @@ test("WordPress tracker requires explicit consent and stops after withdrawal", a
   });
   await page.getByRole("link", { name: "Prueba agenda web" }).click();
   expect(payloads).toHaveLength(2);
+});
+
+test("commercial team app has its own manifest, filters and collapsed notifications", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/equipo");
+  await expect(
+    page.getByRole("heading", { name: "Tu equipo, conectado." }),
+  ).toBeVisible();
+  await expect(page.locator(".compact-alert-content")).toBeHidden();
+  await expect(page.locator(".notification-inbox")).not.toHaveAttribute(
+    "open",
+    "",
+  );
+  await page.getByText("Bandeja de notificaciones", { exact: true }).click();
+  await expect(
+    page.getByText("Estás al día. No hay avisos pendientes."),
+  ).toBeVisible();
+  await page
+    .getByPlaceholder("Nombre, correo o teléfono")
+    .fill("contacto.a@example.com");
+  await expect(
+    page.getByRole("heading", { name: "Contacto de ejemplo A" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Contacto de ejemplo B" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Guardar prospecto" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Mis tareas", exact: true }).click();
+  await expect(
+    page.getByText("No hay tareas que coincidan con estos filtros."),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Instalar CONNECT en mi dispositivo" })
+    .click();
+  await expect(page.getByRole("status")).toContainText("Agregar a inicio");
+  await expect(page.locator('link[rel="manifest"]').last()).toHaveAttribute(
+    "href",
+    "/equipo/manifest.webmanifest",
+  );
+  const r = await request.get("/equipo/manifest.webmanifest");
+  expect(r.status()).toBe(200);
+  expect((await r.json()).start_url).toBe("/equipo");
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+test("internal alerts stay compact and voice requires an explicit choice", async ({
+  page,
+}) => {
+  await page.clock.install();
+  let newProspect = false;
+  let polls = 0;
+  await page.addInitScript(() => {
+    (window as unknown as { spoken: string[] }).spoken = [];
+    Object.defineProperty(window, "speechSynthesis", {
+      configurable: true,
+      value: {
+        cancel() {},
+        speak(s: { text: string }) {
+          (window as unknown as { spoken: string[] }).spoken.push(s.text);
+        },
+      },
+    });
+    Object.defineProperty(window, "SpeechSynthesisUtterance", {
+      configurable: true,
+      value: class {
+        text: string;
+        lang = "";
+        constructor(text: string) {
+          this.text = text;
+        }
+      },
+    });
+  });
+  await page.route("**/api/notifications?*", (route) => {
+    polls++;
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        items: Array.from({ length: 30 }, (_, i) => ({
+          id: newProspect && i === 0 ? "fresh-prospect" : String(i),
+          kind: "new_request",
+        })),
+        enabled: true,
+      }),
+    });
+  });
+  await page.goto("/crm?view=automation");
+  await expect(page.locator(".compact-alerts summary b")).toHaveText("30+");
+  await expect(page.locator(".compact-alert-content")).toBeHidden();
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { spoken: string[] }).spoken,
+    ),
+  ).toEqual([]);
+  await page.locator(".compact-alerts summary").click();
+  await page
+    .getByRole("button", { name: "Activar aviso de voz", exact: true })
+    .click();
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { spoken: string[] }).spoken.length,
+    ),
+  ).toBe(1);
+  await expect(
+    page.getByText(/La voz se reproduce en este dispositivo/),
+  ).toBeVisible();
+  await expect.poll(() => polls).toBeGreaterThanOrEqual(2);
+  newProspect = true;
+  await page.clock.fastForward(60001);
+  await expect
+    .poll(() =>
+      page.evaluate(() => (window as unknown as { spoken: string[] }).spoken),
+    )
+    .toContain("Existe un nuevo prospecto. Revisa tu aplicación CONNECT.");
+  await page.clock.fastForward(60001);
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { spoken: string[] }).spoken.length,
+    ),
+  ).toBe(2);
+  await page
+    .getByRole("button", { name: "Pausar aviso de voz", exact: true })
+    .click();
 });

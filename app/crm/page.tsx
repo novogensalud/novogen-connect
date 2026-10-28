@@ -177,6 +177,9 @@ export default async function Dashboard({
           <span className="status-dot" />
         </div>
         <nav aria-label="Principal">
+          <Link className="nav-item" href={`/equipo?org=${org.id}`}>
+            <UsersRound size={19} /> App del equipo
+          </Link>
           {[
             { id: "overview", label: "Vista general", icon: LayoutDashboard },
             { id: "crm", label: "CRM comercial", icon: UsersRound },
@@ -292,6 +295,7 @@ export default async function Dashboard({
             </form>
           )}
           <DeviceAlerts
+            compact
             endpoint={`/api/notifications?org=${org.id}`}
             refreshOnUpdate
             title="Avisos del equipo comercial"

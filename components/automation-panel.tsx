@@ -1,18 +1,14 @@
 import Link from "next/link";
+import { NotificationInbox } from "./notification-inbox";
 import { MetricsDashboard } from "./metrics-dashboard";
 import type { MetricEvent } from "@/lib/analytics";
 import { supabase } from "@/lib/supabase";
 import {
-  notificationLabels,
   type FollowupTask,
   type CommercialNotification,
 } from "@/lib/automation";
 import type { Lead, Service } from "@/lib/domain";
-import {
-  saveFollowupSettings,
-  updateFollowup,
-  readNotification,
-} from "@/app/actions";
+import { saveFollowupSettings, updateFollowup } from "@/app/actions";
 export async function AutomationPanel({
   org,
   role,
@@ -178,22 +174,7 @@ export async function AutomationPanel({
           avisos internos aunque la aplicación esté cerrada.
         </p>
       </section>
-      <section className="panel form-panel">
-        <h2>Notificaciones internas</h2>
-        {notifications.map((n) => (
-          <div className="notification-row" key={n.id}>
-            <span>{notificationLabels[n.kind]}</span>
-            <form action={readNotification}>
-              {orgInput}
-              <input type="hidden" name="id" value={n.id} />
-              <button className="small-button">Marcar leída</button>
-            </form>
-          </div>
-        ))}
-        {!notifications.length && (
-          <p>No hay avisos pendientes{demo ? " en la demostración" : ""}.</p>
-        )}
-      </section>
+      <NotificationInbox items={notifications} org={org} demo={demo} />
       <section className="panel form-panel">
         <h2>Agenda comercial</h2>
         <p>

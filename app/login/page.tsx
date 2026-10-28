@@ -4,9 +4,9 @@ import { isConfigured } from "@/lib/supabase";
 export default async function Login({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; next?: string }>;
 }) {
-  const { error } = await searchParams;
+  const { error, next } = await searchParams;
   return (
     <main className="login-page">
       <Link href="/" className="wordmark">
@@ -25,6 +25,9 @@ export default async function Login({
           </div>
         )}
         <form action={signIn} className="stack-form">
+          {next === "equipo" && (
+            <input type="hidden" name="next" value="equipo" />
+          )}
           <label>
             Correo electrónico
             <input

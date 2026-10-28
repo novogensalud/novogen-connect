@@ -13,7 +13,10 @@ async function admin(f: FormData) {
   const {
     data: { user },
   } = await db.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user)
+    redirect(
+      value(f, "return_to") === "equipo" ? "/login?next=equipo" : "/login",
+    );
   const org = value(f, "org");
   const { data, error } = await db
     .from("memberships")
@@ -24,8 +27,14 @@ async function admin(f: FormData) {
   if (error || !data) redirect("/crm?notice=forbidden");
   return { db, org, role: data.role as string, userId: user.id };
 }
+function teamBack(org: string, notice: string): never {
+  revalidatePath("/equipo");
+  revalidatePath("/crm");
+  redirect(`/equipo?org=${encodeURIComponent(org)}&notice=${notice}`);
+}
 function back(org: string, notice: string): never {
   revalidatePath("/crm");
+  revalidatePath("/equipo");
   revalidatePath("/connect", "layout");
   redirect(`/crm?org=${encodeURIComponent(org)}&notice=${notice}`);
 }
@@ -36,8 +45,14 @@ export async function signIn(f: FormData) {
     email: value(f, "email"),
     password: value(f, "password"),
   });
-  if (error) redirect("/login?error=credentials");
-  redirect("/crm");
+  const team = value(f, "next") === "equipo";
+  if (error)
+    redirect(
+      team
+        ? "/login?error=credentials&next=equipo"
+        : "/login?error=credentials",
+    );
+  redirect(team ? "/equipo" : "/crm");
 }
 export async function signOut() {
   const db = await supabase();
@@ -84,13 +99,16 @@ export async function updateOpportunity(f: FormData) {
     !stages.includes(stage as (typeof stages)[number]) ||
     next_action.length > 240
   )
-    back(org, "invalid");
+    (value(f, "return_to") === "equipo" ? teamBack : back)(org, "invalid");
   const { error } = await db
     .from("opportunities")
     .update({ stage, next_action })
     .eq("organization_id", org)
     .eq("id", value(f, "id"));
-  back(org, error ? "error" : "saved");
+  (value(f, "return_to") === "equipo" ? teamBack : back)(
+    org,
+    error ? "error" : "saved",
+  );
 }
 export async function addPoint(f: FormData) {
   const { db, org, role } = await admin(f);
@@ -215,6 +233,9 @@ export async function updateFollowup(f: FormData) {
     .update(patch)
     .eq("organization_id", org)
     .eq("id", value(f, "id"));
+  revalidatePath("/equipo");
+  if (value(f, "return_to") === "equipo")
+    teamBack(org, error ? "error" : "saved");
   revalidatePath("/crm");
   redirect(
     `/crm?org=${org}&view=automation&notice=${error ? "error" : "saved"}`,
@@ -228,6 +249,9 @@ export async function readNotification(f: FormData) {
     .eq("id", value(f, "id"))
     .eq("organization_id", org)
     .eq("recipient_id", userId);
+  revalidatePath("/equipo");
+  if (value(f, "return_to") === "equipo")
+    teamBack(org, error ? "error" : "saved");
   revalidatePath("/crm");
   redirect(
     `/crm?org=${org}&view=automation&notice=${error ? "error" : "saved"}`,
@@ -254,6 +278,7 @@ export async function saveChannels(f: FormData) {
         .from("public_channels")
         .insert({ organization_id: org, ...parsed.data });
   revalidatePath("/crm");
+  revalidatePath("/equipo");
   revalidatePath("/connect", "layout");
   redirect(
     `/crm?org=${org}&view=catalog&notice=${result.error ? "error" : "saved"}`,
