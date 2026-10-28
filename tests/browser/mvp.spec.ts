@@ -500,3 +500,35 @@ test("internal alerts stay compact and voice requires an explicit choice", async
     .getByRole("button", { name: "Pausar aviso de voz", exact: true })
     .click();
 });
+
+test("administrator can preview five expandable seats without invented email accounts", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/crm");
+  await page
+    .getByRole("link", { name: "Accesos y cupos", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Tu equipo, a tu medida." }),
+  ).toBeVisible();
+  await expect(page.locator(".access-seats article")).toHaveCount(5);
+  await expect(
+    page.getByRole("button", { name: "Guardar cupo 1", exact: true }),
+  ).toBeDisabled();
+  expect(
+    await page
+      .locator('.access-seats input[type="email"]')
+      .evaluateAll((nodes) =>
+        nodes.every((n) => (n as HTMLInputElement).value === ""),
+      ),
+  ).toBe(true);
+  await expect(
+    page.getByText(/Reservar un cupo no crea un buzón de correo/),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});

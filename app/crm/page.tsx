@@ -177,6 +177,11 @@ export default async function Dashboard({
           <span className="status-dot" />
         </div>
         <nav aria-label="Principal">
+          {role === "admin" && (
+            <Link className="nav-item" href={`/crm/accesos?org=${org.id}`}>
+              <ShieldCheck size={19} /> Accesos y cupos
+            </Link>
+          )}
           <Link className="nav-item" href={`/equipo?org=${org.id}`}>
             <UsersRound size={19} /> App del equipo
           </Link>

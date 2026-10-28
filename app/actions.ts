@@ -284,3 +284,51 @@ export async function saveChannels(f: FormData) {
     `/crm?org=${org}&view=catalog&notice=${result.error ? "error" : "saved"}`,
   );
 }
+
+export async function configureTeamSeat(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const seat = Number(value(f, "seat")),
+    name = value(f, "display_name").trim(),
+    email = value(f, "email").trim(),
+    plannedRole = value(f, "role");
+  let failed =
+    !Number.isInteger(seat) ||
+    seat < 1 ||
+    seat > 100 ||
+    name.length < 2 ||
+    name.length > 100 ||
+    email.length > 254 ||
+    !["admin", "agent"].includes(plannedRole);
+  if (!failed) {
+    const result = await db.rpc("configure_team_seat", {
+      p_org: org,
+      p_seat: seat,
+      p_name: name,
+      p_email: email,
+      p_role: plannedRole,
+    });
+    failed = !!result.error;
+  }
+  revalidatePath("/crm/accesos");
+  redirect(
+    `/crm/accesos?org=${encodeURIComponent(org)}&notice=${failed ? "error" : "saved"}`,
+  );
+}
+export async function expandTeamPlan(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const limit = Number(value(f, "seat_limit"));
+  let failed = !Number.isInteger(limit) || limit < 5 || limit > 100;
+  if (!failed) {
+    const result = await db.rpc("expand_team_plan", {
+      p_org: org,
+      p_limit: limit,
+    });
+    failed = !!result.error;
+  }
+  revalidatePath("/crm/accesos");
+  redirect(
+    `/crm/accesos?org=${encodeURIComponent(org)}&notice=${failed ? "error" : "saved"}`,
+  );
+}

@@ -33,3 +33,13 @@ Desde WordPress: revisar primero si ya hay gestor de consentimiento; instalar Co
 Pendiente confirmar si NOVOGEN ya tiene cuenta o necesita una nueva. El acceso a una cuenta no equivale a tener un remitente WhatsApp habilitado para voz. Antes de envíos reales se necesita número empresarial habilitado, disponibilidad del número/país, credenciales de integración guardadas en variables privadas y un origen público para callbacks verificados.
 
 Destinatarios solicitados: todos los integrantes comerciales habilitados. Cada uno debe autorizar llamadas; las restricciones de WhatsApp incluyen un máximo de cinco llamadas por destinatario en 24 horas con permiso. No convertir los recordatorios horarios en llamadas horarias. No se creó ninguna cuenta, contrató un plan, envió un mensaje o cambió el número WhatsApp actual.
+
+## Cupos configurables
+
+La pantalla `/crm/accesos` está disponible solo para administradores. La migración `202610280006_team_seats.sql` agrega la planificación de cinco cupos iniciales, ampliables hasta 100 desde esta versión. No reejecutar el instalador inicial en un proyecto existente. Antes de 006 se muestra la estructura de cinco cupos sin guardar y con un aviso explícito.
+
+Al activar la configuración se vinculan las membresías existentes sin modificarlas; el resto de los cupos queda por configurar. Si ya existen más de cinco miembros se conserva su número en vez de retirar accesos. Guardar un nombre, correo o rol previsto no crea buzones, cuentas Auth, invitaciones ni permisos de acceso. Los campos de correo/rol de las cuentas vinculadas son de solo lectura. La ampliación no cobra ni contrata servicios y no permite reducir cupos. Se auditan cambios y se comprueba el rol administrador en cada función SQL.
+
+Gmail no está disponible como conector en esta sesión. La pestaña abierta en mail.google.com no da acceso al buzón a las herramientas. La creación de correos solicitada queda pendiente de recuperar las instrucciones mediante una conexión de correo disponible y obtener acceso al proveedor; no se inventaron direcciones ni se crearon cuentas.
+
+Twilio ofrece prueba gratuita con restricciones; las llamadas y mensajes de producción son de pago por uso, según las tarifas vigentes del proveedor. No se creó cuenta ni contrató un plan. Consultar https://www.twilio.com/en-us/whatsapp/pricing y https://www.twilio.com/docs/voice/whatsapp-business-calling antes de configurar llamadas.
