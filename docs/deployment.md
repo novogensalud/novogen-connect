@@ -76,3 +76,12 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Esta migración agrega tres servicios individuales RECOVERY, siete GLOW y canales configurables, sin precios inventados ni eliminación de registros. Sustituye la restricción de tipos de interacción para admitir los nuevos eventos.
 - TikTok sigue vacío porque la fuente original no contiene URL; el administrador puede configurarlo en Catálogo → Canales de CONNECT FLASH después de aplicar la migración.
 - Las métricas cuentan clics consentidos en el nuevo FLASH, no reservas o mensajes efectivamente completados. No se modificó el sitio estático anterior ni la publicación del espacio.
+
+## Dashboard por origen preparado — 28 de octubre de 2026
+
+- Código: `629ed60`, guardado en `feature/connect-crm`.
+- Interfaz con filtros FLASH/web, períodos de 7/14/30 días calendario Chile, actividad diaria, sesiones por canal, destinos, servicios y actualización cada minuto.
+- Validación: 30 pruebas de lógica/base de datos aprobadas; los 10 recorridos de navegador pasaron (la comprobación antigua de WhatsApp se actualizó al nuevo texto y se volvió a ejecutar). Build aprobado; revisión visual local de escritorio y móvil, sin datos de clientes.
+- No desplegado todavía: la CLI encontró la sesión Vercel caducada. La autorización interactiva está pendiente; no se movió el alias ni se afirma que la nueva interfaz esté publicada.
+- Activación de base existente: migración `202610280005_metrics_sources.sql`, una sola vez después de 004. El origen FLASH se conserva para todos los eventos históricos, porque el único colector anterior era FLASH.
+- WordPress no fue modificado: script e instrucciones en `docs/analytics-sources.md`, con consentimiento explícito y dominio permitido. El Preview protegido no permite recibir seguimiento externo de producción; requiere un origen público aprobado.
