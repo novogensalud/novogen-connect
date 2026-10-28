@@ -20,7 +20,7 @@ Para cada integrante hace falta definir nombre, correo y rol. `agent` permite tr
 - Complianz oficial: https://wordpress.org/plugins/complianz-gdpr/
 - ZIP de integración: https://github.com/novogensalud/novogen-connect/raw/refs/heads/feature/connect-crm/integrations/wordpress/novogen-connect-cookies.zip
 
-No hay un conector WordPress ni control del navegador disponible en este entorno. Una sesión que el propietario abra en otra pestaña no transfiere permisos a la CLI. Se requiere intervención de un administrador desde el panel o una conexión administrativa compatible antes de afirmar que se instaló algo.
+La petición automatizada al panel devolvió HTTP 403 y no mostró el formulario de acceso; esto no determina si el propietario puede entrar desde su navegador. No hay un conector WordPress ni control del navegador disponible en este entorno. Una sesión que el propietario abra en otra pestaña no transfiere permisos a la CLI. Se requiere intervención de un administrador desde el panel o una conexión administrativa compatible antes de afirmar que se instaló algo.
 
 Desde WordPress: revisar primero si ya hay gestor de consentimiento; instalar Complianz si no existe otro; configurar consentimiento previo para Estadísticas; subir el ZIP desde Plugins → Añadir nuevo → Subir plugin. El complemento de integración se entrega sin origen configurado y no envía eventos en ese estado. No poner el Preview protegido como origen de analítica de producción. Habilitar el colector público antes de completar Ajustes → CONNECT · Cookies. No se desactivó protección de Vercel.
 
