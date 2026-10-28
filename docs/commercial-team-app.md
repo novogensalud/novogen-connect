@@ -23,3 +23,11 @@ Antes de conectar un proveedor, definir destinatarios (persona asignada o encarg
 Prueba operativa pendiente con cuentas reales: entrar como integrante, recibir un prospecto autorizado, asignarse la tarea, actualizar etapa, comprobar recordatorio y escuchar voz con la app abierta. La validación automatizada cubre la demostración y el aislamiento de datos de las políticas existentes; no sustituye esa prueba con una sesión administrativa real.
 
 Destinatarios elegidos por el usuario: **todos los integrantes del equipo comercial**. La futura integración externa debe aplicar esta preferencia solo a integrantes comerciales habilitados y con permiso de llamada; no enviar a clientes ni reutilizar sus teléfonos como destinatarios internos. La voz local sigue siendo por dispositivo activado.
+
+## Proveedor candidato comprobado: Twilio
+
+La documentación oficial consultada el 28 de octubre de 2026 admite llamadas de negocio salientes a destinatarios WhatsApp mediante Programmable Voice, con From/To `whatsapp:+...`, un remitente registrado y habilitado para voz y aprobación de permiso de llamada de cada destinatario.
+
+Referencia: https://www.twilio.com/docs/voice/whatsapp-business-calling . Las restricciones publicadas incluyen un máximo de cinco llamadas por destinatario en 24 horas después de obtener el permiso. Por tanto, no traducir el recordatorio de cada hora en una llamada de WhatsApp por hora: mantener los avisos internos y reservar las llamadas para prospectos, respetando el cupo y el consentimiento. La vigencia y renovación del permiso dependen del tipo de autorización ofrecida por WhatsApp; comprobarlas al integrar el número real.
+
+No se creó cuenta Twilio, no se habilitó ningún remitente y no se dispone de credenciales de proveedor. Antes de programar envíos reales, activar el remitente, validar disponibilidad del número/país y tarifas, registrar los teléfonos del equipo y permisos, y preparar un origen público para callbacks firmados. No exponer credenciales en el navegador ni usar enlaces wa.me como si iniciaran llamadas automáticas.
