@@ -110,3 +110,13 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Notificaciones plegadas y voz local opcional, solo con app abierta; no llamadas ni mensajes externos. Destinatarios elegidos para una futura integración: todos los integrantes del equipo comercial.
 - Complemento de WordPress preparado en `integrations/wordpress/novogen-connect-cookies.zip`; requiere Complianz, configuración opt-in y origen de colector público aprobado. No instalado en WordPress; no se alteró su sitio ni se desactivó la protección Vercel.
 - La instalación real en WordPress, la prueba autenticada con prospectos reales, Web Push y el proveedor de llamadas WhatsApp permanecen pendientes. No se contrataron servicios ni se enviaron llamadas.
+
+## Cinco cupos configurables — 28 de octubre de 2026
+
+- Código `b3ac42b`, rama `feature/connect-crm`.
+- Preview Ready: `dpl_HBPTUf79hfSzUL11PjtyYduJW3Zj`, https://novogen-connect-ju234u0he-novogen1.vercel.app
+- Alias estable actualizado después de comprobar health 200 y acceso a `/crm/accesos` sin sesión 307 al ingreso.
+- Pantalla administrativa `/crm/accesos`: cinco cupos iniciales, ampliación hasta 100, conservación de cuentas vinculadas y roles previstos para los cupos pendientes. No crea buzones ni cuentas Auth ni concede membresías por reservar un cupo.
+- Validación: 35 pruebas de lógica/base de datos, build y dos recorridos de navegador enfocados en cupos/app comercial aprobados.
+- Pendiente activar una sola vez `202610280006_team_seats.sql`; las migraciones anteriores no deben repetirse. Antes de activarla la configuración se presenta deshabilitada con aviso.
+- Gmail no está disponible como conector; no se leyó el buzón ni se crearon correos. No se contrató Twilio.
