@@ -63,3 +63,16 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - El operador informó la ejecución satisfactoria del activador 003 con `connect-commercial-hourly`, schedule `* * * * *`, active true. Se comprobó desde la aplicación la existencia/protección de tablas nuevas y la columna de subcategorías. El historial real de ejecuciones de cron requiere revisión desde SQL Editor; no es accesible con la clave pública.
 - Regla comercial: recordatorio cada 60 minutos, resaltado rojo tras 24 horas sin avance. El job revisa cada minuto y deduplica por usuario/tarea/ciclo; no envía avisos cada minuto.
 - Web Push con la app cerrada y mensajería automática de WhatsApp/correo continúan pendientes. La protección de acceso de Vercel sigue activa para esta versión de prueba.
+
+## Preview de catálogo individual y controles FLASH — 28 de octubre de 2026
+
+- Código desplegado: `c84f3ab`, rama `feature/connect-crm`.
+- Preview Ready: `dpl_H4hbR3NSCY7YppwVJ27YRzYqBxda`.
+- URL inmutable: https://novogen-connect-3o8g864gx-novogen1.vercel.app
+- Alias de pruebas actualizado: https://novogen-connect-pruebas-novogen1.vercel.app
+- Verificación remota: health 200, formulario de login 200 y CRM sin sesión 307 hacia login.
+- Validación local: 26 pruebas y 8 pruebas de navegador aprobadas; build aprobado.
+- Pendiente ejecutar una sola vez `supabase/migrations/202610270004_flash_catalogue_and_buttons.sql` en el SQL Editor del proyecto existente. La comprobación pública encontró la tabla public_channels ausente y la columna target ausente; no se afirma que el catálogo ni las nuevas métricas estén activados en la base real. No volver a ejecutar el instalador inicial.
+- Esta migración agrega tres servicios individuales RECOVERY, siete GLOW y canales configurables, sin precios inventados ni eliminación de registros. Sustituye la restricción de tipos de interacción para admitir los nuevos eventos.
+- TikTok sigue vacío porque la fuente original no contiene URL; el administrador puede configurarlo en Catálogo → Canales de CONNECT FLASH después de aplicar la migración.
+- Las métricas cuentan clics consentidos en el nuevo FLASH, no reservas o mensajes efectivamente completados. No se modificó el sitio estático anterior ni la publicación del espacio.
