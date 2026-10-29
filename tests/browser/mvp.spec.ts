@@ -549,8 +549,14 @@ test("ORIÉNTAME source manager exposes template and private-library controls on
     page.getByRole("button", { name: "Confirmar importación" }),
   ).toBeDisabled();
   await expect(
-    page.getByText(/Revisar una fuente no activa respuestas automáticas/),
+    page.getByText(/Esta biblioteca del CRM aún no está sincronizada/),
   ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Abrir ORIÉNTAME existente" }),
+  ).toHaveAttribute(
+    "href",
+    "https://novogen-connect.vercel.app/connect/novogen/app#/orientame",
+  );
   const template = await request.get("/api/orientame/sources?template=1");
   expect(template.status()).toBe(200);
   expect(template.headers()["content-disposition"]).toContain("attachment");
@@ -562,4 +568,17 @@ test("ORIÉNTAME source manager exposes template and private-library controls on
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test("FLASH opens the existing WordPress-backed ORIÉNTAME application", async ({
+  page,
+}) => {
+  await page.goto("/connect/novogen");
+  const link = page.getByRole("link", { name: /ORIÉNTAME/ });
+  await expect(link).toHaveAttribute(
+    "href",
+    "https://novogen-connect.vercel.app/connect/novogen/app#/orientame",
+  );
+  await expect(link).toHaveAttribute("target", "_blank");
+  await expect(link).toHaveAttribute("data-connect-target", "orientame");
 });

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { orientationAppUrl } from "@/lib/orientame-integration";
 import { redirect } from "next/navigation";
 import { supabase, isConfigured } from "@/lib/supabase";
 import { OrientationSourceManager } from "@/components/orientame-source-manager";
@@ -11,6 +12,7 @@ export default async function SourcesPage({
 }) {
   const params = await searchParams,
     demo = !isConfigured();
+  let novogen = demo;
   let org = "demo",
     ready = demo,
     sources: StoredOrientationSource[] = [];
@@ -22,7 +24,7 @@ export default async function SourcesPage({
     if (!user) redirect("/login");
     let q = db
       .from("memberships")
-      .select("organization_id")
+      .select("organization_id,organizations(slug)")
       .eq("user_id", user.id)
       .eq("role", "admin");
     if (params.org) q = q.eq("organization_id", params.org);
@@ -35,6 +37,9 @@ export default async function SourcesPage({
         </main>
       );
     org = m.organization_id;
+    novogen =
+      (m.organizations as unknown as { slug: string } | null)?.slug ===
+      "novogen";
     const result = await db
       .from("orientame_sources")
       .select("key,title,type,url,content,status,updated_at")
@@ -64,11 +69,23 @@ export default async function SourcesPage({
         <Link className="inline-link" href={`/crm?org=${org}`}>
           ← Volver al CRM
         </Link>
+        {novogen && (
+          <a
+            className="button"
+            href={orientationAppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Abrir ORIÉNTAME existente
+          </a>
+        )}
       </header>
       <div className="notice">
-        Esta biblioteca gestiona referencias. Revisar una fuente no activa
-        respuestas automáticas ni publica su contenido en FLASH. Los enlaces se
-        guardan como referencia; no se descarga su contenido automáticamente.
+        {novogen
+          ? "ORIÉNTAME ya responde desde el complemento de WordPress. Esta biblioteca del CRM aún no está sincronizada con ese motor: importar o revisar una fuente aquí no cambia sus respuestas."
+          : "Esta biblioteca gestiona referencias; su conexión con un motor de respuestas está pendiente."}{" "}
+        Los enlaces se guardan como referencia; no se descarga su contenido
+        automáticamente.
       </div>
       {demo && (
         <p className="notice">

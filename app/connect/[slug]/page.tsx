@@ -1,3 +1,4 @@
+import { orientationAppUrl } from "@/lib/orientame-integration";
 import { InstallApp } from "@/components/install-app";
 import {
   emptyChannels,
@@ -131,7 +132,9 @@ export default async function Flash({
           </h1>
           <nav className="connect-tiles" aria-label="Accesos FLASH">
             <a
-              href="#contacto"
+              href={novogen ? orientationAppUrl : "#contacto"}
+              target={novogen ? "_blank" : undefined}
+              rel={novogen ? "noopener noreferrer" : undefined}
               className="connect-tile orient"
               data-connect-event="button_click"
               data-connect-target="orientame"

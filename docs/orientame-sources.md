@@ -30,6 +30,14 @@ Ejecutar una sola vez `supabase/migrations/202610290007_orientame_sources.sql` e
 
 Solo administradores de la organización pueden leer, importar, revisar o exportar la biblioteca. Las funciones SQL vuelven a comprobar el rol, separan registros por organización, bloquean la organización durante la importación para serializar límites y generan auditoría de cambios sin copiar contenido al log. No se da acceso público a documentos, enlaces ni notas. Los campos de texto se muestran escapados y no se ejecuta HTML importado.
 
-Esta entrega no conecta un agente, embeddings ni generación automática de respuestas. El botón público ORIÉNTAME continúa como solicitud de orientación comercial. Marcar una fuente como revisada no la publica en FLASH. No importar fichas de pacientes, credenciales ni documentos personales a esta base comercial.
+El propietario identificó el ORIÉNTAME operativo en https://novogen-connect.vercel.app/connect/novogen/app . Se verificó que incorpora el complemento WordPress orientame mediante https://www.novogensalud.cl/?orientame_embed=1 . El FLASH de pruebas abre esa aplicación existente; no se desarrolla ni sustituye su motor. Esta biblioteca todavía no está sincronizada con ese complemento. Marcar una fuente como revisada aquí no modifica las respuestas del asistente ni publica el documento. No importar fichas de pacientes, credenciales ni documentos personales a esta base comercial.
 
 Validación: pruebas PostgreSQL de permisos/aislamiento, importación atómica, actualización y reimportación portable; validación de archivos, URL y claves duplicadas; recorrido móvil de la nueva opción y descarga de plantilla. La prueba con documentos reales y sesión autenticada del administrador queda a cargo del operador una vez activada la migración.
+
+## Contrato del motor existente
+
+Se verificó HTTP 200 para la aplicación y para la vista embebida del complemento `orientame` (assets con versión 0.4.0). El widget envía `{question}` a `POST /wp-json/orientame/v1/query` y representa `answer`, `suggestions` y `sources` con título, URL, vigencia (`valid_until`), ubicación (`location`) y revisión (`reviewed_at`). No se enviaron preguntas ni se modificó WordPress durante esta inspección.
+
+El índice REST público de `/wp-json/orientame/v1` solo anuncia la ruta de consulta. No se encontró un contrato administrativo público de importación/exportación. Para conectar las fuentes se necesita una exportación real o el código administrativo del complemento y acceso autorizado a su gestión. El JSON del CRM es un formato propio; no se afirma compatible con el complemento ni se eliminan fechas de vigencia/revisión del motor. La tabla Supabase permanece privada para administradores y no se abre al público para improvisar la sincronización.
+
+No se debe desplegar el Preview sobre la aplicación pública existente para obtener esta integración. Se mantiene como entorno separado hasta disponer del contrato del complemento.
