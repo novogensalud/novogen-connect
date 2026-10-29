@@ -131,3 +131,14 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Verificación remota oficial: página sin sesión 307 a login, exportación privada sin sesión 401, plantilla genérica 200 con descarga y health 200.
 - La base real respondió 404/PGRST205 para orientame_sources: activar una sola vez `202610290007_orientame_sources.sql`; no repetir migraciones anteriores. Hasta entonces no se afirma que las fuentes estén almacenadas.
 - No se activa un agente ni respuestas automáticas, ni se publica la biblioteca en FLASH. Los enlaces no se descargan automáticamente. No se cambiaron Gmail, WordPress, Twilio ni el acceso del personal.
+
+## Enlace al ORIÉNTAME existente — 29 de octubre de 2026 (Chile)
+
+- El propietario identificó la app operativa https://novogen-connect.vercel.app/connect/novogen/app . Se inspeccionó su HTML público y el widget WordPress sin enviar consultas ni alterar el motor.
+- Motor encontrado: complemento `orientame`, widget publicado v0.4.0, embed https://www.novogensalud.cl/?orientame_embed=1 y consulta POST /wp-json/orientame/v1/query. El índice REST público no anuncia administración de fuentes.
+- Código `5abf736`, Preview Ready `dpl_2QcTZpyXiEDDvxiaXawzFBEatGHY`: https://novogen-connect-rd7c8a3nd-novogen1.vercel.app
+- Alias estable actualizado después de verificar health 200, biblioteca privada sin sesión 307 y FLASH 200 con destino correcto a la app existente. No se modificó el dominio de producción novogen-connect.vercel.app ni WordPress.
+- Build, typecheck y cuatro recorridos de navegador focalizados aprobados. El enlace conserva la medición consentida orientame y abre en otra pestaña.
+- El CRM informa explícitamente que sus fuentes aún no están sincronizadas con el complemento. El enlace al motor NOVOGEN solo se muestra para ese espacio; no se reutiliza en otras organizaciones.
+- Para implementar sincronización se necesita el código del complemento o un contrato/exportación administrativa real, conservando vigencia, ubicación y fecha de revisión. No se afirma compatibilidad automática del JSON del CRM con el formato del motor. No hay conexión administrativa WordPress o control de navegador disponible en estas herramientas.
+- Este ajuste no agrega migraciones ni requiere repetir SQL. La biblioteca import/export continúa dependiendo de la migración 007 ya entregada.
