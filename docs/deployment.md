@@ -120,3 +120,14 @@ Registrar la URL que Vercel entregue; no inventar una URL ni confundir el anteri
 - Validación: 35 pruebas de lógica/base de datos, build y dos recorridos de navegador enfocados en cupos/app comercial aprobados.
 - Pendiente activar una sola vez `202610280006_team_seats.sql`; las migraciones anteriores no deben repetirse. Antes de activarla la configuración se presenta deshabilitada con aviso.
 - Gmail no está disponible como conector; no se leyó el buzón ni se crearon correos. No se contrató Twilio.
+
+## Fuentes de ORIÉNTAME — 28 de octubre de 2026 (Chile)
+
+- Código funcional `b0f4f56`, rama `feature/connect-crm`.
+- Preview Ready `dpl_GKBF2w77LLSY8PYBxbPd7jLmJpMF`: https://novogen-connect-fscgyv9h2-novogen1.vercel.app
+- Alias estable actualizado después de verificar el Preview: https://novogen-connect-pruebas-novogen1.vercel.app
+- Entrada administrativa `/crm/orientame`, enlazada desde el CRM. Importación JSON/TXT/Markdown, referencias HTTPS, previsualización, revisión y exportación privada JSON.
+- Validación local: 37 pruebas de lógica/base de datos aprobadas, build y tres recorridos seleccionados de navegador aprobados.
+- Verificación remota oficial: página sin sesión 307 a login, exportación privada sin sesión 401, plantilla genérica 200 con descarga y health 200.
+- La base real respondió 404/PGRST205 para orientame_sources: activar una sola vez `202610290007_orientame_sources.sql`; no repetir migraciones anteriores. Hasta entonces no se afirma que las fuentes estén almacenadas.
+- No se activa un agente ni respuestas automáticas, ni se publica la biblioteca en FLASH. Los enlaces no se descargan automáticamente. No se cambiaron Gmail, WordPress, Twilio ni el acceso del personal.
