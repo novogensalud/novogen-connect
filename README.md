@@ -107,3 +107,5 @@ El dashboard separa sitio web y CONNECT FLASH, con filtros, actividad diaria y a
 La primera app comercial instalable está en `/equipo`: prospectos, tareas, bandeja compacta y voz local opcional. Ver [alcance y llamadas externas pendientes](docs/commercial-team-app.md). No requiere una migración adicional después de 005.
 
 Los administradores pueden planificar cinco cupos iniciales y ampliarlos desde `/crm/accesos`. Esta función necesita la migración 006; los cupos reservados no crean correos ni cuentas de acceso automáticamente.
+
+Los administradores disponen de [Fuentes de ORIÉNTAME](docs/orientame-sources.md) en `/crm/orientame`: importación JSON/TXT/Markdown, referencias HTTPS, revisión y exportación JSON. Requiere la migración 007; no activa respuestas automáticas.

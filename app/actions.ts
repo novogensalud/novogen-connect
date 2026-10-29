@@ -332,3 +332,66 @@ export async function expandTeamPlan(f: FormData) {
     `/crm/accesos?org=${encodeURIComponent(org)}&notice=${failed ? "error" : "saved"}`,
   );
 }
+
+export async function importOrientationSources(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const { sourceBundleSchema } = await import("@/lib/orientame-sources");
+  let parsed;
+  try {
+    const raw = value(f, "bundle");
+    if (new TextEncoder().encode(raw).length > 2 * 1024 * 1024)
+      throw Error("Oversize");
+    parsed = sourceBundleSchema.safeParse(
+      raw
+        ? JSON.parse(raw)
+        : {
+            version: 1,
+            sources: [
+              {
+                key: value(f, "key"),
+                title: value(f, "title"),
+                type: value(f, "type"),
+                url: value(f, "url"),
+                content: value(f, "content"),
+              },
+            ],
+          },
+    );
+  } catch {
+    parsed = null;
+  }
+  let failed = !parsed?.success;
+  if (parsed?.success) {
+    const result = await db.rpc("import_orientame_sources", {
+      p_org: org,
+      p_sources: parsed.data.sources,
+    });
+    failed = !!result.error;
+  }
+  revalidatePath("/crm/orientame");
+  redirect(
+    `/crm/orientame?org=${encodeURIComponent(org)}&notice=${failed ? "error" : "saved"}`,
+  );
+}
+export async function reviewOrientationSource(f: FormData) {
+  const { db, org, role } = await admin(f);
+  if (role !== "admin") back(org, "forbidden");
+  const status = value(f, "status"),
+    key = value(f, "key");
+  let failed =
+    !["draft", "approved", "archived"].includes(status) ||
+    !/^[a-z0-9][a-z0-9_-]{0,79}$/.test(key);
+  if (!failed) {
+    const result = await db.rpc("review_orientame_source", {
+      p_org: org,
+      p_key: key,
+      p_status: status,
+    });
+    failed = !!result.error;
+  }
+  revalidatePath("/crm/orientame");
+  redirect(
+    `/crm/orientame?org=${encodeURIComponent(org)}&notice=${failed ? "error" : "reviewed"}`,
+  );
+}

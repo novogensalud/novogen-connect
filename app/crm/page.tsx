@@ -16,6 +16,7 @@ import {
   Search,
   LogOut,
   BellRing,
+  BookOpen,
 } from "lucide-react";
 import { isConfigured, supabase } from "@/lib/supabase";
 import { demoOrg, demoServices, demoLeads, demoPoints } from "@/lib/demo";
@@ -177,6 +178,11 @@ export default async function Dashboard({
           <span className="status-dot" />
         </div>
         <nav aria-label="Principal">
+          {role === "admin" && (
+            <Link className="nav-item" href={`/crm/orientame?org=${org.id}`}>
+              <BookOpen size={19} /> Fuentes de ORIÉNTAME
+            </Link>
+          )}
           {role === "admin" && (
             <Link className="nav-item" href={`/crm/accesos?org=${org.id}`}>
               <ShieldCheck size={19} /> Accesos y cupos

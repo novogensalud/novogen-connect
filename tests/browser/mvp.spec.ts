@@ -532,3 +532,34 @@ test("administrator can preview five expandable seats without invented email acc
     ),
   ).toBe(true);
 });
+
+test("ORIÉNTAME source manager exposes template and private-library controls on mobile", async ({
+  page,
+  request,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/crm");
+  await page
+    .getByRole("link", { name: "Fuentes de ORIÉNTAME", exact: true })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Fuentes de ORIÉNTAME", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Confirmar importación" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText(/Revisar una fuente no activa respuestas automáticas/),
+  ).toBeVisible();
+  const template = await request.get("/api/orientame/sources?template=1");
+  expect(template.status()).toBe(200);
+  expect(template.headers()["content-disposition"]).toContain("attachment");
+  expect((await template.json()).version).toBe(1);
+  const demoExport = await request.get("/api/orientame/sources?org=demo");
+  expect(demoExport.status()).toBe(409);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
