@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   poweredByHeader: false,
-  experimental: { serverActions: { bodySizeLimit: "3mb" } },
+  compress: true,
+  experimental: {
+    serverActions: { bodySizeLimit: "3mb" },
+    optimizePackageImports: ["lucide-react"],
+  },
   async headers() {
     return [
       {
@@ -13,6 +17,24 @@ const config: NextConfig = {
           {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
+          },
+        ],
+      },
+      {
+        source: "/brand/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/icons/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

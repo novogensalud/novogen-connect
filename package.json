@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "node --import tsx --test tests/analytics.test.ts tests/automation.test.ts tests/database.test.ts tests/domain.test.ts tests/flash-catalogue.test.ts tests/orientame-sources.test.ts tests/team-seats.test.ts tests/team.test.ts tests/web-consent.test.ts",
     "test:browser": "playwright test"
   },
   "dependencies": {

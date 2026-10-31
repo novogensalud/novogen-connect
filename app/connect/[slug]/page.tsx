@@ -40,6 +40,8 @@ export default async function Flash({
   let org: Organization = demoOrg;
   let services: Service[] = demoServices;
   if (demo && slug !== "novogen") notFound();
+  const novogen = slug === "novogen";
+  let channels: PublicChannels = novogen ? novogenChannels : emptyChannels;
   if (!demo) {
     const db = await supabase();
     const { data, error } = await db
@@ -54,27 +56,32 @@ export default async function Flash({
     }
     if (!data) notFound();
     org = data;
-    const result = await db
-      .from("services")
-      .select("*")
-      .eq("organization_id", org.id)
-      .eq("active", true)
-      .order("created_at");
-    if (result.error) throw new Error("No se pudo cargar el catálogo");
-    services = result.data ?? [];
-  }
-  const novogen = slug === "novogen";
-  let channels: PublicChannels = novogen ? novogenChannels : emptyChannels;
-  if (!demo) {
-    const db = await supabase();
-    const result = await db
-      .from("public_channels")
-      .select("*")
-      .eq("organization_id", org.id)
-      .maybeSingle();
-    if (result.error && !["PGRST205", "42P01"].includes(result.error.code))
+
+    const [servicesResult, channelsResult] = await Promise.all([
+      db
+        .from("services")
+        .select("*")
+        .eq("organization_id", org.id)
+        .eq("active", true)
+        .order("created_at"),
+      db
+        .from("public_channels")
+        .select("*")
+        .eq("organization_id", org.id)
+        .maybeSingle(),
+    ]);
+
+    if (servicesResult.error) throw new Error("No se pudo cargar el catálogo");
+    services = servicesResult.data ?? [];
+
+    if (
+      channelsResult.error &&
+      !["PGRST205", "42P01"].includes(channelsResult.error.code)
+    )
       throw new Error("No se pudieron cargar los canales");
-    if (!result.error) channels = result.data ?? emptyChannels;
+    if (!channelsResult.error && channelsResult.data) {
+      channels = channelsResult.data;
+    }
   }
 
   const selected = services.some((s) => s.id === query.service)

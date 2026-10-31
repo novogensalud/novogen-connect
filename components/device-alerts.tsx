@@ -37,6 +37,7 @@ export function DeviceAlerts({
     setItems([]);
     let active = true;
     const poll = async () => {
+      if (document.visibilityState !== "visible") return;
       try {
         const r = await fetch(endpoint, { cache: "no-store" });
         if (!r.ok) {
