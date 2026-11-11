@@ -1,6 +1,14 @@
 # NOVOGEN CONNECT 1.0 — contratos de integración
 
-Estado: implementación inicial en rama aislada. **No significa que CORE, FINANCE, SUPLE, AgendaLite, ACADEMY o DATA estén conectados.**
+Estado: contratos y persistencia de XP y revisión de canjes en rama de desarrollo. AgendaLite tiene un receptor independiente. Las conexiones externas requieren configuración autorizada.
+
+## Demostración de fidelización
+
+Aplicar la migración `202610310011_connect_loyalty.sql` a una base de prueba y activar `CONNECT_LOYALTY_ENABLED=true` solo en ese entorno. Crear reglas, niveles, recompensas y revisores sintéticos con el propietario de la base. En el CRM, la sección Fidelización muestra el ranking trimestral y la cola de revisión para administradores. La revisión exige también una autorización explícita por organización. Ninguna regla ni recompensa se activa por defecto.
+
+Las funciones de registro de XP y de solicitud de canje son internas y requieren un servidor que ya haya comprobado origen e identidad. El ranking usa trimestres y los últimos doce meses según la hora de Santiago. Snake y Bloques locales siguen siendo recreativos. La aprobación solo registra la decisión, dejando pendiente el débito y la entrega. No hay saldo financiero local ni se envía ninguna operación a FINANCE.
+
+El trabajador futuro puede registrar confirmaciones verificadas mediante `confirm_connect_redemption_debit` y `complete_connect_redemption`. Ambas operaciones requieren credencial de servidor, conservan la referencia original y rechazan reintentos contradictorios. El débito debe estar registrado antes de cerrar la entrega. Los proveedores deben deduplicar sus operaciones externas usando `request_id`.
 
 ## Principios
 
@@ -51,7 +59,7 @@ Reintentos limitados con backoff y cola de pendientes; nunca reintentar con un i
 ## Pendientes reales antes de activar
 
 - Identificar endpoints, credenciales de servicio y mecanismos de autenticación disponibles de CORE, FINANCE, SUPLE, AgendaLite, ACADEMY y DATA.
-- Definir tablas RLS y migraciones para eventos, XP, recompensas y canjes según el esquema Supabase existente.
-- Implementar adaptadores y confirmaciones reales, permisos de CRM, pantallas mínimas y pruebas transaccionales.
+- Aprobar reglas de XP, niveles, recompensas y permisos antes de configurarlos en la base.
+- Conectar la identidad verificada y los adaptadores de eventos, débito y entrega con sus sistemas propietarios.
 - Verificar pruebas `npm run typecheck`, `npm test`, `npm run build`, RLS con sesiones reales y casos de doble solicitud, devolución, reintento y fallo parcial.
 - Preparar staging con secretos separados, migraciones reversibles, comprobación de salud y rollback. No desplegar producción con integraciones simuladas.

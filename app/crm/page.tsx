@@ -7,6 +7,7 @@ import { DeviceAlerts } from "@/components/device-alerts";
 import { AutomationPanel } from "@/components/automation-panel";
 import { MarketingWorkspace } from "@/components/marketing-ai/marketing-workspace";
 import { BookingInbox } from "@/components/booking-inbox";
+import { LoyaltyPanel } from "@/components/loyalty-panel";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -54,6 +55,7 @@ export default async function Dashboard({
   const demo = !isConfigured();
   const marketingEnabled = demo || process.env.CONNECT_MARKETING_AI_PREVIEW === "true";
   const marketingRequested = marketingEnabled && params.view === "marketing";
+  const loyaltyConfigured = !demo && process.env.CONNECT_LOYALTY_ENABLED === "true";
   let org = demoOrg;
   let orgs: Organization[] = [demoOrg];
   let services: Service[] = demoServices;
@@ -105,7 +107,7 @@ export default async function Dashboard({
         (m) => (m.organizations as unknown as Organization)?.id === org.id,
       )?.role ?? "agent";
     // Marketing preview does not load commercial contacts.
-    if (!marketingRequested) {
+    if (!marketingRequested && !(loyaltyConfigured && role === "admin" && params.view === "loyalty")) {
     const results = await Promise.all([
       db
         .from("services")
@@ -148,7 +150,8 @@ export default async function Dashboard({
     eventCount = results[3].count ?? 0;
     }
   }
-  const view = ["overview", "crm", "catalog", "points", "automation", "bookings", ...(marketingEnabled ? ["marketing"] : [])].includes(
+  const loyaltyEnabled = loyaltyConfigured && role === "admin";
+  const view = ["overview", "crm", "catalog", "points", "automation", "bookings", ...(loyaltyEnabled ? ["loyalty"] : []), ...(marketingEnabled ? ["marketing"] : [])].includes(
     params.view ?? "",
   )
     ? params.view!
@@ -215,6 +218,9 @@ export default async function Dashboard({
             href={href("bookings")} className={view === "bookings" ? "nav-item selected" : "nav-item"}>
             <CalendarDays size={19} /> Reservas
           </Link>}
+          {loyaltyEnabled && <Link href={href("loyalty")} className={view === "loyalty" ? "nav-item selected" : "nav-item"}>
+            <Activity size={19} /> Fidelización
+          </Link>}
         </nav>
         <div className="sidebar-bottom">
           <div className="pilot-note">
@@ -253,7 +259,7 @@ export default async function Dashboard({
             <div>
               <span className="eyebrow">TU ECOSISTEMA COMERCIAL</span>
               <h1>
-                {view === "marketing" ? "Marketing AI" : view === "bookings" ? "Reservas de Agendalite" : view === "overview"
+                {view === "loyalty" ? "Fidelización" : view === "marketing" ? "Marketing AI" : view === "bookings" ? "Reservas de Agendalite" : view === "overview"
                   ? "Cada conexión cuenta."
                   : view === "crm"
                     ? "CRM comercial"
@@ -264,7 +270,7 @@ export default async function Dashboard({
                         : "Puntos CONNECT"}
               </h1>
               <p>
-                {view === "marketing" ? "Planificación editorial de prueba dentro de CONNECT CRM." : view === "bookings" ? "La actividad de la agenda en tu espacio comercial." : view === "overview"
+                {view === "loyalty" ? "Consulta el ranking y revisa solicitudes de canje." : view === "marketing" ? "Planificación editorial de prueba dentro de CONNECT CRM." : view === "bookings" ? "La actividad de la agenda en tu espacio comercial." : view === "overview"
                   ? "Una mirada clara a las personas, los servicios y las oportunidades."
                   : view === "crm"
                     ? "Acompaña cada oportunidad, desde el primer contacto."
@@ -280,6 +286,7 @@ export default async function Dashboard({
             </Link>
           </div>
           {view === "bookings" && <BookingInbox organizationId={org.id} />}
+          {view === "loyalty" && <LoyaltyPanel organizationId={org.id} result={params.review} />}
           {demo && (
             <div className="demo-notice">
               <span className="status-dot" />
