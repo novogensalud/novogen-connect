@@ -1,0 +1,10 @@
+.git/
+.next/
+node_modules/
+.env*
+!.env.example
+published-connect/
+test-results/
+playwright-report/
+*.tsbuildinfo
+.next-mobile-verify/
