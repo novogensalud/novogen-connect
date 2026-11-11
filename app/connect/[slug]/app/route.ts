@@ -29,11 +29,20 @@ export async function GET(
     if (org.error)
       return new Response("No se pudo cargar CONNECT", { status: 503 });
     if (!org.data) return new Response("No disponible", { status: 404 });
-    const result = await db
-      .from("public_channels")
-      .select("*")
-      .eq("organization_id", org.data.id)
-      .maybeSingle();
+    const organizationId = org.data.id;
+    const [result, catalogue] = await Promise.all([
+      db
+        .from("public_channels")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .maybeSingle(),
+      db
+        .from("services")
+        .select("*")
+        .eq("organization_id", organizationId)
+        .eq("active", true)
+        .order("created_at"),
+    ]);
     if (result.error)
       return new Response("No se pudieron cargar los canales", { status: 503 });
     const parsed = channelSchema.safeParse(result.data ?? emptyChannels);
@@ -42,12 +51,6 @@ export async function GET(
         status: 503,
       });
     channels = parsed.data;
-    const catalogue = await db
-      .from("services")
-      .select("*")
-      .eq("organization_id", org.data.id)
-      .eq("active", true)
-      .order("created_at");
     if (catalogue.error)
       return new Response("No se pudo cargar el catálogo", { status: 503 });
     services = catalogue.data ?? [];
